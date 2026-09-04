@@ -151,6 +151,12 @@
   .mini-action-btn:hover{filter:brightness(1.05);}
 
   .full-row{width:100%; margin: 0 0 4px;}
+  .image-card{
+    width:100%; background: linear-gradient(180deg,#F9EFD6,var(--parchment)); border:3px solid var(--wood);
+    border-radius:6px; padding:10px; box-shadow: var(--shadow);
+  }
+  .image-card .rc-title{font-family: var(--pixel-font); font-size:9px; color:var(--wood); letter-spacing:.03em; margin-bottom:8px;}
+  .image-card img{width:100%; display:block; border-radius:4px; border:2px solid var(--wood-light);}
   .reward-card{
     width:100%; background: linear-gradient(180deg,#F9EFD6,var(--parchment)); border:3px solid var(--gold-dark);
     border-radius: 6px; padding:12px 14px; box-shadow: var(--shadow); color:var(--ink);
@@ -372,7 +378,7 @@
    （K1=Validate 清單／Alt=Upgrade 替代說法清單／Continue=延續對話清單）
    ============================================================ */
 const DEFAULT_UNITS = [
-  { id: "unit1", title: "🎂 Personal Preferences",
+  { id: "unit1", title: "🎂 Personal Preferences", image: "img/unit1.png",
     steps: [
       { label: "Prompt 1", question: "Take a look at the picture. What can you see?", questionZh: "仔細看這張圖片，你看到了什麼？" },
       { label: "Prompt 2", question: "Can you describe the people in the picture?", questionZh: "你能描述一下圖片中的人物嗎？" },
@@ -389,7 +395,7 @@ const DEFAULT_UNITS = [
       continuePool: ["What gift did you buy for your friend?", "How long have you known her?", "What do you like most about your friend?", "What is your friend planning to do after dinner?", "Would you like to take some photos together?", "What is your friend's favourite birthday cake?", "Are there any other surprises planned for the party?", "How do you usually celebrate your own birthday?"]
     }
   },
-  { id: "unit2", title: "🍽️ Choosing a Restaurant",
+  { id: "unit2", title: "🍽️ Choosing a Restaurant", image: "img/unit2.png",
     steps: [
       { label: "Prompt 1", question: "What can you see in the picture?", questionZh: "你在圖片中看到了什麼？" },
       { label: "Prompt 2", question: "What is happening in the picture?", questionZh: "圖片中發生了什麼事？" },
@@ -406,7 +412,7 @@ const DEFAULT_UNITS = [
       continuePool: ["Why do you think Teacher would like that restaurant?", "What kind of food does Teacher enjoy?", "How many students will join the dinner?", "Should we make a reservation now?", "What date and time would be best for everyone?", "Should we prepare a card or gift for Teacher as well?", "How much should each student contribute?"]
     }
   },
-  { id: "unit3", title: "📞 Making a Reservation",
+  { id: "unit3", title: "📞 Making a Reservation", image: "img/unit3.png",
     steps: [
       { label: "Prompt 1", question: "What can you see in the picture?", questionZh: "你在圖片中看到了什麼？" },
       { label: "Prompt 2", question: "What is happening in the picture?", questionZh: "圖片中發生了什麼事？" },
@@ -423,7 +429,7 @@ const DEFAULT_UNITS = [
       continuePool: ["What date would you like?", "What time would you prefer?", "Would you like a window seat?"]
     }
   },
-  { id: "unit4", title: "📖 Ordering Food",
+  { id: "unit4", title: "📖 Ordering Food", image: "img/unit4.png",
     steps: [
       { label: "Prompt 1", question: "What can you see in the picture?", questionZh: "你在圖片（菜單）中看到了什麼？" },
       { label: "Prompt 2", question: "What courses are included in the lunch special?", questionZh: "午間特餐包含哪些餐點？" },
@@ -440,7 +446,7 @@ const DEFAULT_UNITS = [
       continuePool: ["Would you like soup or salad with your meal?", "Which entrée would you like: Chicken Kiev, Fish of the Day, or Lamb Chops?", "What would you like to drink? Coffee, tea, fresh juice, or sparkling mineral water?", "Would you like dessert after your meal?", "Have you tried this restaurant before?", "Why did you choose that dish?", "Would any of your friends like to share an appetizer?", "Do you have any special dietary requirements?", "Would you like me to recommend today's most popular lunch special?", "How would you like your meal prepared?"]
     }
   },
-  { id: "unit5", title: "⚠️ Solving a Problem",
+  { id: "unit5", title: "⚠️ Solving a Problem", image: "img/unit5.png",
     steps: [
       { label: "Prompt 1", question: "What can you see in the picture?", questionZh: "你在圖片中看到了什麼？" },
       { label: "Prompt 2", question: "Who are the people in the picture?", questionZh: "圖片中的人是誰？" },
@@ -457,7 +463,7 @@ const DEFAULT_UNITS = [
       continuePool: ["I'm sorry about that. What did you order?"]
     }
   },
-  { id: "unit6", title: "🎉 Planning a Banquet",
+  { id: "unit6", title: "🎉 Planning a Banquet", image: "img/unit6.png",
     steps: [
       { label: "Prompt 1", question: "How many people will attend the event? Where are they from?", questionZh: "這場活動有多少人參加？他們來自哪裡？" },
       { label: "Prompt 2", question: "What are some things that some people cannot eat?", questionZh: "有些人不能吃哪些東西？" },
@@ -677,6 +683,7 @@ function startUnit(idx, opts){
 
   hasActiveChat = true;
   transcriptEl.innerHTML = '';
+  if(unit.image){ addImageCard(unit.image, unit.title); }
   collectedSuggestions = state.history.filter(h => h.type !== 'roleplay').map(h => ({ label: h.label, text: h.suggestedAnswer }))
     .concat(state.history.filter(h => h.type === 'roleplay' && h.altLine).map(h => ({ label: "Let's SPEAK", text: h.altLine })));
 
@@ -952,6 +959,16 @@ function addAiDialogueInstant(html, portrait){
   transcriptEl.appendChild(row);
   transcriptEl.scrollTop = transcriptEl.scrollHeight;
   return row;
+}
+function addImageCard(src, alt){
+  const row = document.createElement('div');
+  row.className = 'full-row';
+  row.innerHTML = `<div class="image-card">
+    <div class="rc-title">👀 LOOK AT THE PICTURE</div>
+    <img src="${escapeHtml(src)}" alt="${escapeHtml(alt || '')}" loading="lazy">
+  </div>`;
+  transcriptEl.appendChild(row);
+  transcriptEl.scrollTop = transcriptEl.scrollHeight;
 }
 function addRewardCard(titleHtml, bodyHtml, cls){
   const row = document.createElement('div');
