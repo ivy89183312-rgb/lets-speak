@@ -53,8 +53,6 @@
   .screen{display:none; flex-direction:column; height:100%; width:100%;}
   .screen.active{display:flex;}
 
-  .pixel-font{font-family: var(--pixel-font);}
-
   /* ---------- Quest-giver header (chat screen) ---------- */
   .header{
     padding: 12px 14px; background: linear-gradient(180deg,var(--wood-light),var(--wood)); border-bottom: 4px solid var(--wood-dark);
@@ -129,9 +127,18 @@
   }
   .dlg-row.me .dlg-box{background:#EFE3C4;}
   .dlg-box .qlabel{font-family: var(--pixel-font); font-size:8px; color:var(--coral); letter-spacing:.03em; margin-bottom:5px; display:block;}
-  .dlg-box.typing-cursor::after{content:'▌'; animation: caretBlink .8s infinite; color:var(--ink-muted); margin-left:1px;}
-  @keyframes caretBlink{0%,50%{opacity:1;}51%,100%{opacity:0;}}
   .timestamp{font-size:9.5px; color:#8A7A5C; padding: 0 4px;}
+
+  .q-en{font-size:14px; line-height:1.55; transition: filter .2s;}
+  .q-en.blurred{filter: blur(6px); user-select:none;}
+  .q-zh{font-size:12.5px; color:var(--ink-muted); margin-top:4px;}
+  .q-actions{display:flex; gap:8px; margin-top:9px;}
+  .mini-action-btn{
+    font-family: var(--pixel-font); font-size:8px; color:var(--wood-dark);
+    background:var(--gold); border:2px solid var(--gold-dark); border-radius:5px;
+    padding:6px 8px; cursor:pointer;
+  }
+  .mini-action-btn:hover{filter:brightness(1.05);}
 
   .full-row{width:100%; margin: 0 0 4px;}
   .reward-card{
@@ -140,6 +147,7 @@
   }
   .reward-card .rc-title{font-family: var(--pixel-font); font-size:9px; color:var(--gold-dark); letter-spacing:.03em; margin-bottom:6px; display:flex; align-items:center; gap:6px;}
   .reward-card .en-line{font-family:'Space Grotesk',sans-serif; font-size:14.5px; color:var(--ink); margin-top:2px;}
+  .reward-card .zh-line{color:var(--ink-muted); font-size:12.5px; margin-top:4px;}
   .tip-card{
     width:100%; background:rgba(244,234,208,.12); border:2px dashed #6B5A3E; border-radius:6px;
     padding:10px 13px; color:#D8C6A0; font-size:12.5px;
@@ -224,7 +232,7 @@
   .reminder-screen p b{color:var(--gold);}
   .reminder-actions{display:flex; flex-direction:column; gap:8px; width:100%; max-width:260px; margin-top:8px;}
   .reminder-actions .next-btn{width:100%;}
-  .link-btn{background:none;border:none;color:#B7A57E; font-size:12.5px; text-decoration:underline; cursor:pointer;}
+  .link-btn{background:none;border:none;color:#B7A57E; font-size:13px; text-decoration:underline; cursor:pointer;}
 
   /* ================= RPG OVERWORLD MAP ================= */
   .map-hud{display:flex; align-items:center; gap:8px; padding:12px 14px; background: linear-gradient(180deg,var(--wood-light),var(--wood)); border-bottom: 4px solid var(--wood-dark);}
@@ -256,40 +264,28 @@
   @keyframes bounceMark{0%,100%{transform:translateY(0);}50%{transform:translateY(-6px);}}
   .here-tag{position:absolute; top:-46px; background:#2C1F14; color:#F2C572; font-family: var(--pixel-font); font-size:8px; padding:5px 8px; border-radius:4px; white-space:nowrap;}
   .here-tag::after{content:''; position:absolute; bottom:-4px; left:50%; transform:translateX(-50%); border:4px solid transparent; border-top-color:#2C1F14;}
-  .node-caption{font-size:11px; color:#fff; font-weight:700; text-shadow:0 1px 3px rgba(0,0,0,.4); margin-top:6px;}
+  .node-caption-row{display:flex; align-items:center; gap:6px; margin-top:6px;}
+  .node-caption{font-size:11px; color:#fff; font-weight:700; text-shadow:0 1px 3px rgba(0,0,0,.4);}
+  .share-node-btn{
+    background:rgba(0,0,0,.4); border:1px solid rgba(255,255,255,.3); color:#fff; font-size:11px;
+    width:21px; height:21px; border-radius:5px; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0;
+  }
+  .share-node-btn:hover{background:rgba(0,0,0,.6);}
   .lock-toast{position:absolute; left:50%; bottom:20px; transform:translateX(-50%); background:#2C1F14; color:#F2C572; font-family: var(--pixel-font); font-size:9.5px; padding:10px 14px; border-radius:6px; box-shadow:var(--shadow); z-index:10; opacity:0; transition:opacity .2s; text-align:center; line-height:1.7; max-width:230px;}
   .lock-toast.show{opacity:1;}
 
-  /* ---------- Overlay / admin panel ---------- */
+  /* ---------- Share modal ---------- */
   .overlay{position:fixed; inset:0; background:rgba(0,0,0,.55); display:none; align-items:center; justify-content:center; padding:20px; z-index:40;}
   .overlay.open{display:flex;}
-  .panel{background:#FBF8F2; border-radius:16px; padding:22px; width:100%; max-width:440px; max-height:84vh; overflow-y:auto; box-shadow: 0 8px 30px rgba(0,0,0,.3); color:#2C2620;}
+  .panel{background:#FBF8F2; border-radius:16px; padding:22px; width:100%; max-width:400px; max-height:84vh; overflow-y:auto; box-shadow: 0 8px 30px rgba(0,0,0,.3); color:#2C2620;}
   .panel h3{margin:0 0 4px; font-family:'Space Grotesk',sans-serif;}
-  .panel p.desc{color:#8A8172; font-size:13px; line-height:1.5; margin:0 0 14px;}
-  .unit-row{border:1px solid #E3DBCB; border-radius:14px; padding:12px 14px; margin-bottom:10px; position:relative;}
-  .unit-row.locked{opacity:.6; background:#F4F1E9;}
-  .unit-row-top{display:flex; align-items:center; justify-content:space-between; gap:8px;}
-  .unit-row-title{font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:14px; display:flex; align-items:center; gap:6px;}
-  .level-num{width:22px; height:22px; border-radius:50%; background:#E3DBCB; color:#8A8172; font-size:11px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0;}
-  .unit-row:not(.locked) .level-num{background:#D97C4A; color:#fff;}
-  .unit-status{font-size:11.5px; padding:3px 9px; border-radius:999px; white-space:nowrap;}
-  .unit-status.done{background:#E7EFE3; color:#6E8F6A;}
-  .unit-status.todo{background:#F4E3D3; color:#D97C4A;}
-  .unit-status.locked{background:#E3DBCB; color:#8A8172;}
-  .unit-row-link{font-size:11.5px; color:#8A8172; margin-top:6px; word-break:break-all;}
-  .unit-row-actions{display:flex; gap:8px; margin-top:10px;}
-  .small-btn{flex:1; padding:7px; border-radius:9px; border:1px solid #E3DBCB; background:#fff; font-size:12px; cursor:pointer; color:#2C2620;}
-  .small-btn:hover{border-color:#D97C4A; color:#D97C4A;}
-  .qr-box{display:none; justify-content:center; padding:12px; background:#fff; border-radius:12px; margin-top:10px;}
-  .qr-box.open{display:flex;}
-  .panel-footer{display:flex; gap:8px; margin-top:16px; padding-top:14px; border-top:1px solid #E3DBCB;}
+  .panel p.desc{color:#8A8172; font-size:13px; line-height:1.5; margin:0 0 12px;}
+  .share-url{font-size:12px; word-break:break-all; background:#F4F1E9; border:1px solid #E3DBCB; border-radius:8px; padding:10px 12px; margin-bottom:12px; color:#2C2620;}
+  .panel-footer{display:flex; gap:8px;}
   .btn-primary, .btn-secondary{flex:1; padding:9px; border-radius:10px; border:none; cursor:pointer; font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:12.5px;}
   .btn-primary{background:#D97C4A; color:#fff;}
   .btn-secondary{background:transparent; border:1px solid #E3DBCB; color:#2C2620;}
-  .advanced{margin-top:14px;}
-  .advanced summary{cursor:pointer; font-size:12.5px; color:#8A8172;}
-  .advanced textarea{width:100%; height:160px; background:#fff; color:#2C2620; border:1px solid #E3DBCB; border-radius:10px; padding:10px; font-family:monospace; font-size:11.5px; margin-top:8px;}
-  .err{color:#C15C4A; font-size:12px; margin-top:6px; display:none;}
+  .qr-box{display:flex; justify-content:center; padding:14px; background:#fff; border-radius:12px;}
 
   ::-webkit-scrollbar{width:6px;}
   ::-webkit-scrollbar-thumb{background:var(--wood-light); border-radius:3px;}
@@ -306,7 +302,6 @@
       <div class="map-title">🗺️ QUEST MAP</div>
       <div class="pixel-chip" id="mapLvChip">LV.1</div>
       <div class="pixel-chip" id="mapXpBadge">💎 0</div>
-      <button class="icon-btn" id="mapAdminBtn" title="教材管理（給老師用）">⚙</button>
     </div>
     <div class="map-path" id="mapPath"></div>
   </div>
@@ -334,7 +329,7 @@
       <div class="input-row" id="mainInputRow">
         <span class="cmd-prompt">&gt;</span>
         <textarea id="answerInput" rows="1" placeholder="輸入你的回答…"></textarea>
-        <button class="mic-btn" id="micBtn" title="語音輸入">🎙</button>
+        <button class="mic-btn" id="micBtn" title="語音輸入（再按一次結束錄音）">🎙</button>
         <button class="send-btn" id="sendBtn">➤</button>
       </div>
     </div>
@@ -352,25 +347,16 @@
   </div>
 </div>
 
-<div class="overlay" id="settingsOverlay">
+<div class="overlay" id="shareOverlay">
   <div class="panel">
-    <h3>🗺 關卡管理（教師用）</h3>
-    <p class="desc">每一關都有專屬連結，複製連結或掃描 QR Code 就能直接挑戰該關卡。如果學生跳過前面的關卡，Coach Ivy 會用任務提示引導她先過關。</p>
-    <div id="unitList"></div>
-
-    <details class="advanced">
-      <summary>進階：編輯課程內容 JSON</summary>
-      <textarea id="materialInput" spellcheck="false"></textarea>
-      <div class="err" id="materialErr">JSON 格式錯誤，請確認後再試一次。</div>
-      <div class="panel-footer">
-        <button class="btn-secondary" id="loadDemoBtn">還原示範課程</button>
-        <button class="btn-primary" id="applyMaterialBtn">套用</button>
-      </div>
-    </details>
+    <h3 id="shareTitle">🔗 分享關卡</h3>
+    <p class="desc">複製連結或掃描 QR Code，就能直接開啟這個關卡。</p>
+    <div class="share-url" id="shareUrl"></div>
     <div class="panel-footer">
-      <button class="btn-secondary" id="resetProgressBtn">重設進度與星星</button>
-      <button class="btn-secondary" id="closeSettingsBtn">關閉</button>
+      <button class="btn-primary" id="shareCopyBtn">🔗 複製連結</button>
+      <button class="btn-secondary" id="shareCloseBtn">關閉</button>
     </div>
+    <div class="qr-box" id="shareQrBox" style="margin-top:14px;"></div>
   </div>
 </div>
 
@@ -380,31 +366,61 @@
    ============================================================ */
 const DEFAULT_UNITS = [
   { id: "restaurant", title: "在餐廳點餐 Dining Out", steps: [
-    { label: "Prompt 1", question: "Have you ever eaten at a restaurant that had a very long wait for a table?" },
-    { label: "Prompt 2", question: "What do you usually do while you're waiting to be seated?" },
-    { label: "Prompt 3", question: "What drinks can a diner usually choose from at a restaurant?" },
-    { label: "Prompt 4", question: "Do you prefer eating at a restaurant or ordering food delivery? Why?" },
-    { label: "Situation", question: "You are meeting an important client for dinner. The waiter has just brought the menu and is ready to take your order." },
-    { label: "Main Question", question: "What would you say to the waiter to order your meal politely?" }
+    { label: "Prompt 1", question: "Have you ever eaten at a restaurant that had a very long wait for a table?", questionZh: "你有沒有在某間餐廳等位子等了很久的經驗？" },
+    { label: "Prompt 2", question: "What do you usually do while you're waiting to be seated?", questionZh: "等待入座的時候，你通常都在做什麼？" },
+    { label: "Prompt 3", question: "What drinks can a diner usually choose from at a restaurant?", questionZh: "在餐廳用餐時，通常有哪些飲料可以選擇？" },
+    { label: "Prompt 4", question: "Do you prefer eating at a restaurant or ordering food delivery? Why?", questionZh: "你比較喜歡在餐廳吃飯，還是叫外送？為什麼？" },
+    { label: "Situation", question: "You are meeting an important client for dinner. The waiter has just brought the menu and is ready to take your order.", questionZh: "你正要和一位重要客戶共進晚餐，服務生剛送上菜單，準備為你點餐。" },
+    { label: "Main Question", question: "What would you say to the waiter to order your meal politely?", questionZh: "你會怎麼禮貌地跟服務生點餐？" }
   ]},
   { id: "airport", title: "機場報到 Airport Check-in", steps: [
-    { label: "Prompt 1", question: "Have you ever had a stressful experience at an airport?" },
-    { label: "Prompt 2", question: "What do you usually bring with you in your carry-on bag?" },
-    { label: "Prompt 3", question: "What documents does a passenger usually need to show at check-in?" },
-    { label: "Prompt 4", question: "Do you prefer a window seat or an aisle seat? Why?" },
-    { label: "Situation", question: "You are checking in for an international flight. The check-in agent asks about your luggage." },
-    { label: "Main Question", question: "What would you say to the agent about your luggage and your seat preference?" }
+    { label: "Prompt 1", question: "Have you ever had a stressful experience at an airport?", questionZh: "你有沒有在機場遇過讓人緊張的經驗？" },
+    { label: "Prompt 2", question: "What do you usually bring with you in your carry-on bag?", questionZh: "你的隨身行李通常都會帶什麼東西？" },
+    { label: "Prompt 3", question: "What documents does a passenger usually need to show at check-in?", questionZh: "旅客在報到時通常需要出示哪些證件？" },
+    { label: "Prompt 4", question: "Do you prefer a window seat or an aisle seat? Why?", questionZh: "你比較喜歡靠窗還是靠走道的座位？為什麼？" },
+    { label: "Situation", question: "You are checking in for an international flight. The check-in agent asks about your luggage.", questionZh: "你正在辦理國際航班的報到手續，地勤人員詢問你行李的狀況。" },
+    { label: "Main Question", question: "What would you say to the agent about your luggage and your seat preference?", questionZh: "關於行李和座位偏好，你會怎麼跟地勤人員說？" }
   ]},
   { id: "interview", title: "面試前的閒聊 Interview Small Talk", steps: [
-    { label: "Prompt 1", question: "Have you ever felt nervous before an important meeting?" },
-    { label: "Prompt 2", question: "What do you usually do to calm your nerves before a big event?" },
-    { label: "Prompt 3", question: "What topics are common for small talk before a job interview?" },
-    { label: "Prompt 4", question: "Do you prefer arriving early or right on time for an interview? Why?" },
-    { label: "Situation", question: "You arrive at the office for a job interview. The receptionist greets you while you wait." },
-    { label: "Main Question", question: "What would you say to make polite small talk with the receptionist?" }
+    { label: "Prompt 1", question: "Have you ever felt nervous before an important meeting?", questionZh: "你有沒有在重要會議前感到緊張過？" },
+    { label: "Prompt 2", question: "What do you usually do to calm your nerves before a big event?", questionZh: "在重要場合前，你通常怎麼讓自己冷靜下來？" },
+    { label: "Prompt 3", question: "What topics are common for small talk before a job interview?", questionZh: "面試前的閒聊，通常會聊哪些話題？" },
+    { label: "Prompt 4", question: "Do you prefer arriving early or right on time for an interview? Why?", questionZh: "面試你比較喜歡提早到，還是準時到？為什麼？" },
+    { label: "Situation", question: "You arrive at the office for a job interview. The receptionist greets you while you wait.", questionZh: "你到公司準備參加面試，等待時櫃檯人員向你打招呼。" },
+    { label: "Main Question", question: "What would you say to make polite small talk with the receptionist?", questionZh: "你會怎麼跟櫃檯人員禮貌地閒聊幾句？" }
   ]}
 ];
-let UNITS = DEFAULT_UNITS;
+const UNITS = DEFAULT_UNITS;
+
+// 部署好 Worker 之後，把下面這個網址換成你自己的 Worker 網址
+const WORKER_URL = "https://letsspeak.ivy89183312.workers.dev";
+
+/* ============================================================
+   PERSISTENCE (localStorage — 每個學生的瀏覽器各自記錄自己的進度)
+   ============================================================ */
+const LS_KEY = 'letsspeak_state_v1';
+function loadState(){
+  try{
+    const raw = localStorage.getItem(LS_KEY);
+    const parsed = raw ? JSON.parse(raw) : null;
+    if(parsed && typeof parsed === 'object'){
+      return { totalXP: parsed.totalXP || 0, units: parsed.units || {} };
+    }
+  }catch(e){ /* ignore */ }
+  return { totalXP: 0, units: {} };
+}
+function saveState(){
+  try{ localStorage.setItem(LS_KEY, JSON.stringify(appState)); }catch(e){ /* storage full/blocked — ignore */ }
+}
+function getUnitState(id){
+  if(!appState.units[id]) appState.units[id] = { stepIndex: 0, completed: false, history: [] };
+  return appState.units[id];
+}
+function isUnitDone(id){
+  return !!(appState.units[id] && appState.units[id].completed);
+}
+
+let appState = loadState();
 
 /* ============================================================
    STATE
@@ -414,9 +430,8 @@ let stepIndex = 0;
 let collectedSuggestions = [];
 let busy = false;
 let recognizing = false;
+let manualStopRecognition = true;
 let recognition = null;
-let completedUnits = [];
-let totalXP = 0;
 let hasActiveChat = false;
 
 const screens = {
@@ -449,32 +464,57 @@ function nowTime(){ return new Date().toLocaleTimeString('zh-TW', { hour:'2-digi
 function unitUrl(id){ return window.location.origin + window.location.pathname + '?unit=' + encodeURIComponent(id); }
 
 /* ============================================================
-   STORAGE
+   SOUND EFFECTS (Web Audio — 不用載任何音檔)
    ============================================================ */
-async function loadCompleted(){
-  try{
-    const res = await window.storage.get('completed-units', false);
-    completedUnits = res && res.value ? JSON.parse(res.value) : [];
-  }catch(e){ completedUnits = []; }
-  try{
-    const res2 = await window.storage.get('total-xp', false);
-    totalXP = res2 && res2.value ? (parseInt(res2.value, 10) || 0) : 0;
-  }catch(e){ totalXP = 0; }
-  renderXp();
+let audioCtx = null;
+function ensureAudioCtx(){
+  if(!audioCtx){
+    const Ctx = window.AudioContext || window.webkitAudioContext;
+    if(Ctx) audioCtx = new Ctx();
+  }
+  return audioCtx;
 }
-async function markUnitComplete(id){
-  if(!completedUnits.includes(id)) completedUnits.push(id);
-  try{ await window.storage.set('completed-units', JSON.stringify(completedUnits), false); }catch(e){}
+function playTone(freq, duration, type, volume){
+  try{
+    const ctx = ensureAudioCtx();
+    if(!ctx) return;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = type || 'sine';
+    osc.frequency.value = freq;
+    gain.gain.value = volume != null ? volume : 0.12;
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start();
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+    osc.stop(ctx.currentTime + duration);
+  }catch(e){ /* ignore */ }
 }
+function sfx(kind){
+  switch(kind){
+    case 'click': playTone(600, 0.07, 'square', 0.05); break;
+    case 'send': playTone(520, 0.08, 'square', 0.07); setTimeout(() => playTone(720, 0.08, 'square', 0.06), 55); break;
+    case 'success': playTone(660, 0.09, 'sine', 0.09); setTimeout(() => playTone(880, 0.13, 'sine', 0.09), 100); break;
+    case 'levelup': [523, 659, 784, 1046].forEach((f, i) => setTimeout(() => playTone(f, 0.16, 'triangle', 0.12), i * 90)); break;
+    case 'lock': playTone(220, 0.16, 'sawtooth', 0.07); break;
+    case 'mic': playTone(880, 0.06, 'sine', 0.06); break;
+    case 'micoff': playTone(440, 0.08, 'sine', 0.06); break;
+  }
+}
+
+/* ============================================================
+   XP / LEVEL
+   ============================================================ */
 function renderXp(){
-  xpBadgeEl.textContent = `⭐ ${totalXP}`;
-  mapXpBadgeEl.textContent = `💎 ${totalXP}`;
-  mapLvChipEl.textContent = `LV.${completedUnits.length + 1}`;
+  const doneCount = Object.values(appState.units).filter(u => u.completed).length;
+  xpBadgeEl.textContent = `⭐ ${appState.totalXP}`;
+  mapXpBadgeEl.textContent = `💎 ${appState.totalXP}`;
+  mapLvChipEl.textContent = `LV.${doneCount + 1}`;
 }
-async function awardXp(amount, anchorEl){
-  totalXP += amount;
+function awardXp(amount, anchorEl){
+  appState.totalXP += amount;
+  saveState();
   renderXp();
-  try{ await window.storage.set('total-xp', String(totalXP), false); }catch(e){}
   if(anchorEl){
     const toast = document.createElement('div');
     toast.className = 'xp-toast';
@@ -495,8 +535,8 @@ function getRequestedUnitId(){
 function goToUnit(id){ window.location.search = '?unit=' + encodeURIComponent(id); }
 function goHome(){ window.location.search = ''; }
 
-async function boot(){
-  await loadCompleted();
+function boot(){
+  renderXp();
   route();
 }
 function route(){
@@ -504,7 +544,7 @@ function route(){
   if(requestedId){
     let idx = UNITS.findIndex(u => u.id === requestedId);
     if(idx === -1) idx = 0;
-    const priorMissing = UNITS.slice(0, idx).filter(u => !completedUnits.includes(u.id));
+    const priorMissing = UNITS.slice(0, idx).filter(u => !isUnitDone(u.id));
     showScreen('chat');
     if(priorMissing.length > 0){
       showReminder(idx, priorMissing[0]);
@@ -519,27 +559,60 @@ function route(){
 function showReminder(requestedIdx, firstMissingUnit){
   const requestedUnit = UNITS[requestedIdx];
   const missingIdx = UNITS.findIndex(u => u.id === firstMissingUnit.id);
-  document.getElementById('reminderTitle').textContent = `LEVEL ${requestedIdx + 1} LOCKED`;
+  document.getElementById('reminderTitle').textContent = `Level ${requestedIdx + 1} 暫時鎖定中`;
   document.getElementById('reminderText').innerHTML =
     `你想挑戰的是 <b>Level ${requestedIdx + 1}：${escapeHtml(requestedUnit.title)}</b>，`
     + `不過任務日誌顯示 <b>Level ${missingIdx + 1}：${escapeHtml(firstMissingUnit.title)}</b> 還沒過關。`
     + `先完成它，解鎖效果會更好，也能拿到更多 💎！`;
   reminderScreen.style.display = 'flex';
-  document.getElementById('goToPriorBtn').onclick = () => goToUnit(firstMissingUnit.id);
+  document.getElementById('goToPriorBtn').onclick = () => { sfx('click'); goToUnit(firstMissingUnit.id); };
   document.getElementById('startAnywayBtn').onclick = () => {
+    sfx('click');
     reminderScreen.style.display = 'none';
     startUnit(requestedIdx);
   };
 }
-function startUnit(idx){
+function startUnit(idx, opts){
+  opts = opts || {};
   currentUnitIdx = idx;
-  stepIndex = 0;
-  collectedSuggestions = [];
+  const unit = UNITS[idx];
+  const state = getUnitState(unit.id);
+
+  if(opts.forceRestart){
+    state.stepIndex = 0;
+    state.completed = false;
+    state.history = [];
+    saveState();
+  }
+
   hasActiveChat = true;
   transcriptEl.innerHTML = '';
+  collectedSuggestions = state.history.map(h => ({ label: h.label, text: h.suggestedAnswer }));
+
+  if(state.completed){
+    renderReviewMode(unit, state);
+    return;
+  }
+
+  stepIndex = state.stepIndex || 0;
+  state.history.forEach(h => renderHistoryEntry(h));
   mainInputRow.style.display = 'flex';
   askToggle.style.display = 'inline';
   askCurrentQuestion();
+}
+function renderReviewMode(unit, state){
+  mainInputRow.style.display = 'none';
+  askToggle.style.display = 'none';
+  stepIndex = unit.steps.length;
+  renderProgress();
+  addSystemNote('✅ 你已經完成這一關了，以下是你的作答紀錄：');
+  state.history.forEach(h => renderHistoryEntry(h));
+  const row = document.createElement('div');
+  row.className = 'restart-row';
+  row.innerHTML = `<button class="next-btn" id="mapReturnBtn2">🗺 返回地圖</button><button class="link-btn" id="restartBtn2">🔁 重新挑戰這一關</button>`;
+  transcriptEl.appendChild(row);
+  document.getElementById('mapReturnBtn2').addEventListener('click', () => { sfx('click'); goHome(); });
+  document.getElementById('restartBtn2').addEventListener('click', () => { sfx('click'); startUnit(currentUnitIdx, { forceRestart: true }); });
 }
 
 /* ============================================================
@@ -553,8 +626,8 @@ function renderMap(){
   pathEl.innerHTML = '';
   let nextUpFound = false;
   UNITS.forEach((u, idx) => {
-    const done = completedUnits.includes(u.id);
-    const locked = idx > 0 && UNITS.slice(0, idx).some(p => !completedUnits.includes(p.id));
+    const done = isUnitDone(u.id);
+    const locked = idx > 0 && UNITS.slice(0, idx).some(p => !isUnitDone(p.id));
     const isNextUp = !done && !locked && !nextUpFound;
     if(isNextUp) nextUpFound = true;
     const isBoss = idx === UNITS.length - 1;
@@ -562,6 +635,7 @@ function renderMap(){
     let statusClass = done ? 'done' : (locked ? 'locked' : 'current');
     if(isBoss && !locked) statusClass += ' boss';
     let icon = done ? '🏆' : (locked ? '🔒' : (isBoss ? '🏰' : (idx + 1)));
+    const url = unitUrl(u.id);
     const row = document.createElement('div');
     row.className = 'path-node-row ' + side;
     row.innerHTML = `
@@ -571,7 +645,10 @@ function renderMap(){
           ${icon}
           <div class="lvl-tag">LV${idx + 1}</div>
         </div>
-        <div class="node-caption">${escapeHtml(u.title)}</div>
+        <div class="node-caption-row">
+          <span class="node-caption">${escapeHtml(u.title)}</span>
+          <button class="share-node-btn" data-title="${escapeHtml(u.title)}" data-url="${escapeHtml(url)}" title="分享這一關">🔗</button>
+        </div>
       </div>`;
     pathEl.appendChild(row);
   });
@@ -586,10 +663,19 @@ function renderMap(){
   pathEl.querySelectorAll('.path-node').forEach(node => {
     node.addEventListener('click', () => {
       if(node.dataset.locked === 'true'){
+        sfx('lock');
         showLockToast(`🔒 先完成前面的關卡\n才能挑戰 LV${node.dataset.level} 喔！`);
       } else {
+        sfx('click');
         goToUnit(node.dataset.id);
       }
+    });
+  });
+  pathEl.querySelectorAll('.share-node-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      sfx('click');
+      openShare(btn.dataset.title, btn.dataset.url);
     });
   });
 }
@@ -605,8 +691,31 @@ function showLockToast(msg){
   requestAnimationFrame(() => toast.classList.add('show'));
   setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 250); }, 2200);
 }
-document.getElementById('mapBackBtn').addEventListener('click', () => showScreen('chat'));
-document.getElementById('mapOpenBtn').addEventListener('click', () => { renderMap(); showScreen('map'); });
+document.getElementById('mapBackBtn').addEventListener('click', () => { sfx('click'); showScreen('chat'); });
+document.getElementById('mapOpenBtn').addEventListener('click', () => { sfx('click'); renderMap(); showScreen('map'); });
+
+/* ---------------- Share modal ---------------- */
+const shareOverlay = document.getElementById('shareOverlay');
+function openShare(title, url){
+  document.getElementById('shareTitle').textContent = '🔗 ' + title;
+  document.getElementById('shareUrl').textContent = url;
+  const qrBox = document.getElementById('shareQrBox');
+  qrBox.innerHTML = '';
+  if(window.QRCode){
+    new QRCode(qrBox, { text: url, width: 140, height: 140, colorDark: "#2C2620", colorLight: "#ffffff" });
+  }
+  const copyBtn = document.getElementById('shareCopyBtn');
+  copyBtn.textContent = '🔗 複製連結';
+  copyBtn.onclick = () => {
+    navigator.clipboard.writeText(url).then(() => {
+      copyBtn.textContent = '已複製 ✓';
+      setTimeout(() => copyBtn.textContent = '🔗 複製連結', 1500);
+    }).catch(() => {});
+  };
+  shareOverlay.classList.add('open');
+}
+document.getElementById('shareCloseBtn').addEventListener('click', () => shareOverlay.classList.remove('open'));
+shareOverlay.addEventListener('click', (e) => { if(e.target === shareOverlay) shareOverlay.classList.remove('open'); });
 
 /* ============================================================
    QUEST DIALOGUE (CHAT) RENDERING
@@ -637,45 +746,67 @@ function renderProgress(){
   materialTitleEl.textContent = `LV${currentUnitIdx + 1}：${unit.title}`;
 }
 
-/* Typewriter reveal for dialogue text — click to skip */
-function typeText(el, text, speed){
-  return new Promise(resolve => {
-    speed = speed || 16;
-    let i = 0;
-    el.textContent = '';
-    el.classList.add('typing-cursor');
-    let done = false;
-    function finish(){
-      if(done) return;
-      done = true;
-      el.textContent = text;
-      el.classList.remove('typing-cursor');
-      el.removeEventListener('click', finish);
-      clearInterval(timer);
-      resolve();
-    }
-    const timer = setInterval(() => {
-      i++;
-      el.textContent = text.slice(0, i);
-      if(i >= text.length) finish();
-    }, speed);
-    el.addEventListener('click', finish);
-  });
+/* ---- Text-to-speech ---- */
+function speak(text){
+  try{
+    if(!('speechSynthesis' in window)) return;
+    window.speechSynthesis.cancel();
+    const utter = new SpeechSynthesisUtterance(text);
+    utter.lang = 'en-US';
+    utter.rate = 0.95;
+    window.speechSynthesis.speak(utter);
+  }catch(e){ /* ignore */ }
 }
 
-function addAiDialogue(labelHtml, text, portrait){
+/* ---- Masked (打碼) question bubble with reveal + replay ---- */
+let dlgCounter = 0;
+function addQuestionDialogue(step){
+  const id = 'q' + (dlgCounter++);
   const row = document.createElement('div');
   row.className = 'dlg-row';
-  row.innerHTML = `<div class="dlg-portrait">${portrait || '🦉'}</div>
+  row.innerHTML = `<div class="dlg-portrait">📜</div>
     <div class="dlg-col">
       <span class="speaker-tag npc">COACH IVY</span>
-      <div class="dlg-box">${labelHtml || ''}<span class="dlg-text"></span></div>
+      <div class="dlg-box">
+        <span class="qlabel">📜 ${escapeHtml(step.label)}</span>
+        <div class="q-en blurred" id="${id}-en">${escapeHtml(step.question)}</div>
+        <div class="q-zh" id="${id}-zh" style="display:none;">${escapeHtml(step.questionZh || '')}</div>
+        <div class="q-actions">
+          <button class="mini-action-btn" id="${id}-replay">🔊 再聽一次</button>
+          <button class="mini-action-btn" id="${id}-reveal">🔍 看文字</button>
+        </div>
+      </div>
       <div class="timestamp">${nowTime()}</div>
     </div>`;
   transcriptEl.appendChild(row);
   transcriptEl.scrollTop = transcriptEl.scrollHeight;
-  const textEl = row.querySelector('.dlg-text');
-  typeText(textEl, text, 14).then(() => { transcriptEl.scrollTop = transcriptEl.scrollHeight; });
+  document.getElementById(id + '-replay').addEventListener('click', () => { sfx('click'); speak(step.question); });
+  document.getElementById(id + '-reveal').addEventListener('click', () => {
+    sfx('click');
+    const enEl = document.getElementById(id + '-en');
+    const zhEl = document.getElementById(id + '-zh');
+    const btn = document.getElementById(id + '-reveal');
+    const isBlurred = enEl.classList.contains('blurred');
+    if(isBlurred){
+      enEl.classList.remove('blurred');
+      zhEl.style.display = 'block';
+      btn.textContent = '🙈 隱藏文字';
+    } else {
+      enEl.classList.add('blurred');
+      zhEl.style.display = 'none';
+      btn.textContent = '🔍 看文字';
+    }
+  });
+  speak(step.question);
+}
+/* ---- Plain (already revealed) dialogue — used for history / review ---- */
+function addAiDialogueInstant(html, portrait){
+  const row = document.createElement('div');
+  row.className = 'dlg-row';
+  row.innerHTML = `<div class="dlg-portrait">${portrait || '🦉'}</div>
+    <div class="dlg-col"><span class="speaker-tag npc">COACH IVY</span><div class="dlg-box">${html}</div><div class="timestamp">${nowTime()}</div></div>`;
+  transcriptEl.appendChild(row);
+  transcriptEl.scrollTop = transcriptEl.scrollHeight;
   return row;
 }
 function addRewardCard(titleHtml, bodyHtml, cls){
@@ -706,19 +837,33 @@ function addMeMessage(text){
   transcriptEl.appendChild(row);
   transcriptEl.scrollTop = transcriptEl.scrollHeight;
 }
+function renderHistoryEntry(h){
+  addAiDialogueInstant(`<span class="qlabel">📜 ${escapeHtml(h.label)}</span><div>${escapeHtml(h.question)}</div>${h.questionZh ? `<div class="q-zh" style="display:block;">${escapeHtml(h.questionZh)}</div>` : ''}`, '📜');
+  addMeMessage(h.studentAnswer);
+  addAiDialogueInstant(`<span class="qlabel">🌟 STATUS</span>${escapeHtml(h.positiveFeedback)}`);
+  addRewardCard('💰 NEW PHRASE UNLOCKED', `<div class="en-line">${escapeHtml(h.suggestedAnswer)}</div>${h.suggestedAnswerZh ? `<div class="zh-line">${escapeHtml(h.suggestedAnswerZh)}</div>` : ''}`);
+  if(h.quickTip){
+    addRewardCard('🔎 QUICK TIP', `<div>${escapeHtml(h.quickTip)}</div>`, 'tip-card');
+  }
+}
+
 function askCurrentQuestion(){
   renderProgress();
   const step = currentUnit().steps[stepIndex];
   if(!step){ showCompletion(); return; }
-  addAiDialogue(`<span class="qlabel">📜 ${escapeHtml(step.label)}</span>`, step.question, '📜');
+  addQuestionDialogue(step);
   mainInputRow.style.display = 'flex';
   answerInput.value = '';
   answerInput.focus();
 }
-async function showCompletion(){
-  await markUnitComplete(currentUnit().id);
+function showCompletion(){
+  const state = getUnitState(currentUnit().id);
+  state.completed = true;
+  state.stepIndex = currentUnit().steps.length;
+  saveState();
   mainInputRow.style.display = 'none';
   askToggle.style.display = 'none';
+  sfx('levelup');
   let listHtml = collectedSuggestions.map(s => `<li><b>${escapeHtml(s.label)}:</b> ${escapeHtml(s.text)}</li>`).join('');
   const bonusXp = 30;
   const card = addRewardCard('', `
@@ -736,9 +881,9 @@ async function showCompletion(){
     + (nextUnit ? `<button class="link-btn" id="nextUnitBtn">🚀 直接挑戰 Level ${currentUnitIdx + 2}</button>` : '')
     + `<button class="link-btn" id="restartBtn">🔁 重玩這一關</button>`;
   transcriptEl.appendChild(row);
-  document.getElementById('mapReturnBtn').addEventListener('click', goHome);
-  if(nextUnit) document.getElementById('nextUnitBtn').addEventListener('click', () => goToUnit(nextUnit.id));
-  document.getElementById('restartBtn').addEventListener('click', () => startUnit(currentUnitIdx));
+  document.getElementById('mapReturnBtn').addEventListener('click', () => { sfx('click'); goHome(); });
+  if(nextUnit) document.getElementById('nextUnitBtn').addEventListener('click', () => { sfx('click'); goToUnit(nextUnit.id); });
+  document.getElementById('restartBtn').addEventListener('click', () => { sfx('click'); startUnit(currentUnitIdx, { forceRestart: true }); });
 }
 function spawnConfetti(container){
   if(!container) return;
@@ -767,37 +912,26 @@ function hideTyping(){ const el = document.getElementById('typingRow'); if(el) e
 /* ============================================================
    AI CALLS (via your own Cloudflare Worker + Gemini API)
    ============================================================ */
-// 部署好 Worker 之後，把下面這個網址換成你自己的 Worker 網址
-// 例如："https://lets-speak-proxy.your-subdomain.workers.dev"
-const WORKER_URL = "https://letsspeak.ivy89183312.workers.dev";
-
-async function callClaude(system, userContent){
+async function getFeedback(label, question, answer){
   const response = await fetch(WORKER_URL, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ system: system, message: userContent })
+    body: JSON.stringify({ mode: "feedback", label, question, answer })
   });
   const data = await response.json();
   if(!response.ok || data.error){ console.error('AI proxy error:', data.error); throw new Error(data.error || 'API error'); }
-  let raw = (data.text || '').replace(/```json|```/g, '').trim();
-  if(!raw){ console.error('Empty response from proxy:', data); throw new Error('Empty response'); }
-  try{ return JSON.parse(raw); }
-  catch(parseErr){
-    const match = raw.match(/\{[\s\S]*\}/);
-    if(match){ try{ return JSON.parse(match[0]); }catch(e2){} }
-    console.error('Could not parse JSON from response:', raw);
-    throw new Error('Bad JSON from model — raw: ' + raw.slice(0, 200));
-  }
+  return data;
 }
-const FEEDBACK_SYSTEM = `你是「Let's SPEAK AI Speaking Partner」中負責產生回饋的模組。你不是出題者，絕對不可以出新題目、不可以做 follow-up 問題、不可以建議下一題內容，只需要針對「這一題」與「學生剛才的回答」產生回饋。
-
-規則：
-1. 一律先給正向回饋，語氣溫暖、絕對不可以是負面評價——即使學生答錯、答非所問、只回一個字、用中文回答、中英混合、寫「不知道/I don't know」也一樣。正向回饋不代表把錯的答案說成對的。
-2. 一定要提供 Suggested Answer，且必須：符合目前這一題、約1–3句、自然道地的英文、TOEIC 700–990 程度、適合成人職場或日常溝通、優先使用 TOEIC 常見字彙、比學生的答案稍微完整（可加理由/細節/連接詞）、不要用過度艱深的學術英文。這是「更完整的說法」，不是唯一標準答案。
-3. 只有當學生回答中有明顯值得學習的英文問題時，才加入 Quick Tip，只能解釋學生剛才回答中的問題，不可以變成新題目；沒有明顯問題就回傳 null。
-4. 只回傳一個 JSON 物件，不要有其他文字、不要 markdown code fence：
-{"positiveFeedback": "一兩句中文為主的正向回饋", "suggestedAnswer": "英文建議回答", "quickTip": "中文說明或 null"}`;
-const ASK_SYSTEM = `你是英文口說教練，學生在練習途中主動問了一個關於英文的問題（文法、單字、說法、或請你再說一次）。請用清楚、簡短（3-5句內）、中文為主必要時搭配英文範例的方式回答。只回傳 JSON，不要有其他文字：{"answer": "..."}`;
+async function askAI(question, askText){
+  const response = await fetch(WORKER_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ mode: "ask", question, askText })
+  });
+  const data = await response.json();
+  if(!response.ok || data.error){ console.error('AI proxy error:', data.error); throw new Error(data.error || 'API error'); }
+  return data;
+}
 
 async function submitAnswer(text){
   if(busy) return;
@@ -808,16 +942,31 @@ async function submitAnswer(text){
   mainInputRow.style.display = 'none';
   showTyping();
   try{
-    const userContent = `目前題目 (${step.label}): "${step.question}"\n\n學生的回答: "${text}"\n\n請依照系統規則產生 JSON 回饋。`;
-    const result = await callClaude(FEEDBACK_SYSTEM, userContent);
+    const result = await getFeedback(step.label, step.question, text);
     hideTyping();
-    addAiDialogue(`<span class="qlabel">🌟 STATUS</span>`, result.positiveFeedback || '', '🌟');
+    sfx('success');
+    addAiDialogueInstant(`<span class="qlabel">🌟 STATUS</span>${escapeHtml(result.positiveFeedback || '')}`);
     await new Promise(r => setTimeout(r, 60));
-    addRewardCard('💰 NEW PHRASE UNLOCKED', `<div class="en-line">${escapeHtml(result.suggestedAnswer || '')}</div>`);
+    addRewardCard('💰 NEW PHRASE UNLOCKED', `<div class="en-line">${escapeHtml(result.suggestedAnswer || '')}</div><div class="zh-line">${escapeHtml(result.suggestedAnswerZh || '')}</div>`);
     if(result.quickTip && result.quickTip !== 'null'){
       addRewardCard('🔎 QUICK TIP', `<div>${escapeHtml(result.quickTip)}</div>`, 'tip-card');
     }
     collectedSuggestions.push({ label: step.label, text: result.suggestedAnswer || '' });
+
+    const state = getUnitState(currentUnit().id);
+    state.history.push({
+      label: step.label,
+      question: step.question,
+      questionZh: step.questionZh || '',
+      studentAnswer: text,
+      positiveFeedback: result.positiveFeedback || '',
+      suggestedAnswer: result.suggestedAnswer || '',
+      suggestedAnswerZh: result.suggestedAnswerZh || '',
+      quickTip: (result.quickTip && result.quickTip !== 'null') ? result.quickTip : null
+    });
+    state.stepIndex = stepIndex + 1;
+    saveState();
+
     const row = document.createElement('div');
     row.className = 'next-btn-row';
     row.innerHTML = `<button class="next-btn" id="nextBtn">▶ 繼續任務</button>`;
@@ -825,6 +974,7 @@ async function submitAnswer(text){
     transcriptEl.scrollTop = transcriptEl.scrollHeight;
     awardXp(10, row);
     document.getElementById('nextBtn').addEventListener('click', () => {
+      sfx('click');
       row.remove();
       stepIndex += 1;
       askCurrentQuestion();
@@ -843,6 +993,7 @@ async function submitAnswer(text){
 sendBtn.addEventListener('click', () => {
   const text = answerInput.value.trim();
   if(!text) return;
+  sfx('send');
   submitAnswer(text);
 });
 answerInput.addEventListener('keydown', (e) => {
@@ -852,6 +1003,7 @@ answerInput.addEventListener('keydown', (e) => {
 /* ---------------- Ask-a-question side flow ---------------- */
 let askOpen = false;
 askToggle.addEventListener('click', () => {
+  sfx('click');
   askOpen = !askOpen;
   if(askOpen){
     askToggle.textContent = '✕ 收起提問';
@@ -871,15 +1023,15 @@ askToggle.addEventListener('click', () => {
     document.getElementById('askSendBtn').addEventListener('click', async () => {
       const q = document.getElementById('askInput').value.trim();
       if(!q) return;
+      sfx('send');
       row.remove();
       addMeMessage(q);
       showTyping();
       try{
         const cur = currentUnit().steps[stepIndex];
-        const ctx = `學生目前正在練習這題: "${cur ? cur.question : ''}"\n\n學生的問題: "${q}"`;
-        const result = await callClaude(ASK_SYSTEM, ctx);
+        const result = await askAI(cur ? cur.question : '', q);
         hideTyping();
-        addAiDialogue('', result.answer || '', '💡');
+        addAiDialogueInstant(escapeHtml(result.answer || ''), '💡');
       }catch(err){
         hideTyping();
         addSystemNote('回答時發生問題，請再試一次。');
@@ -896,120 +1048,56 @@ askToggle.addEventListener('click', () => {
   }
 });
 
-/* ---------------- Voice input ---------------- */
+/* ---------------- Voice input (continuous — 只有按停止才會停) ---------------- */
 const SpeechRecognitionImpl = window.SpeechRecognition || window.webkitSpeechRecognition;
+let baseTextBeforeListening = '';
 if(SpeechRecognitionImpl){
   recognition = new SpeechRecognitionImpl();
   recognition.lang = 'en-US';
-  recognition.interimResults = false;
+  recognition.continuous = true;
+  recognition.interimResults = true;
   recognition.maxAlternatives = 1;
+
   recognition.onresult = (e) => {
-    const said = e.results[0][0].transcript;
-    answerInput.value = (answerInput.value ? answerInput.value + ' ' : '') + said;
+    let finalChunk = '';
+    let interimChunk = '';
+    for(let i = e.resultIndex; i < e.results.length; i++){
+      const transcript = e.results[i][0].transcript;
+      if(e.results[i].isFinal) finalChunk += transcript;
+      else interimChunk += transcript;
+    }
+    if(finalChunk) baseTextBeforeListening = (baseTextBeforeListening + ' ' + finalChunk).trim();
+    answerInput.value = (baseTextBeforeListening + ' ' + interimChunk).trim();
   };
-  recognition.onend = () => { recognizing = false; micBtn.classList.remove('listening'); micBtn.innerHTML = '🎙'; };
+  recognition.onerror = () => { /* 忽略偶發錯誤，交給 onend 處理是否要自動重啟 */ };
+  recognition.onend = () => {
+    if(!manualStopRecognition){
+      // 使用者還沒按停止，瀏覽器自己斷線（例如短暫沒偵測到聲音）→ 自動重新開始聆聽
+      try{ recognition.start(); }catch(e){ /* ignore */ }
+    } else {
+      recognizing = false;
+      micBtn.classList.remove('listening');
+      micBtn.innerHTML = '🎙';
+    }
+  };
   micBtn.addEventListener('click', () => {
-    if(recognizing){ recognition.stop(); return; }
+    if(recognizing){
+      sfx('micoff');
+      manualStopRecognition = true;
+      recognition.stop();
+      return;
+    }
+    sfx('mic');
+    manualStopRecognition = false;
+    baseTextBeforeListening = answerInput.value ? answerInput.value.trim() : '';
     recognizing = true;
     micBtn.classList.add('listening');
     micBtn.innerHTML = '<div class="wave"><span></span><span></span><span></span><span></span></div>';
-    recognition.start();
+    try{ recognition.start(); }catch(e){ /* ignore */ }
   });
 } else {
   micBtn.style.display = 'none';
 }
-
-/* ============================================================
-   ADMIN PANEL (teacher tools)
-   ============================================================ */
-const settingsOverlay = document.getElementById('settingsOverlay');
-const unitListEl = document.getElementById('unitList');
-const materialInput = document.getElementById('materialInput');
-const materialErr = document.getElementById('materialErr');
-
-function renderUnitList(){
-  unitListEl.innerHTML = '';
-  UNITS.forEach((u, idx) => {
-    const done = completedUnits.includes(u.id);
-    const locked = idx > 0 && UNITS.slice(0, idx).some(p => !completedUnits.includes(p.id));
-    const url = unitUrl(u.id);
-    const statusLabel = done ? '★ 已通關' : (locked ? '🔒 未解鎖' : '▶ 可挑戰');
-    const statusClass = done ? 'done' : (locked ? 'locked' : 'todo');
-    const row = document.createElement('div');
-    row.className = 'unit-row' + (locked ? ' locked' : '');
-    row.innerHTML = `
-      <div class="unit-row-top">
-        <div class="unit-row-title"><span class="level-num">${idx + 1}</span>${escapeHtml(u.title)}</div>
-        <div class="unit-status ${statusClass}">${statusLabel}</div>
-      </div>
-      <div class="unit-row-link">${escapeHtml(url)}</div>
-      <div class="unit-row-actions">
-        <button class="small-btn" data-action="copy" data-url="${escapeHtml(url)}">🔗 複製連結</button>
-        <button class="small-btn" data-action="qr" data-id="${escapeHtml(u.id)}" data-url="${escapeHtml(url)}">▦ QR Code</button>
-        <button class="small-btn" data-action="go" data-id="${escapeHtml(u.id)}">前往</button>
-      </div>
-      <div class="qr-box" id="qrbox-${escapeHtml(u.id)}"></div>
-    `;
-    unitListEl.appendChild(row);
-  });
-  unitListEl.querySelectorAll('button[data-action="copy"]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      navigator.clipboard.writeText(btn.dataset.url).then(() => {
-        btn.textContent = '已複製 ✓';
-        setTimeout(() => btn.textContent = '🔗 複製連結', 1500);
-      }).catch(() => {});
-    });
-  });
-  unitListEl.querySelectorAll('button[data-action="go"]').forEach(btn => {
-    btn.addEventListener('click', () => goToUnit(btn.dataset.id));
-  });
-  unitListEl.querySelectorAll('button[data-action="qr"]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const id = btn.dataset.id;
-      const box = document.getElementById('qrbox-' + id);
-      const isOpen = box.classList.contains('open');
-      unitListEl.querySelectorAll('.qr-box').forEach(b => { b.classList.remove('open'); b.innerHTML=''; });
-      if(!isOpen){
-        box.classList.add('open');
-        if(window.QRCode){
-          new QRCode(box, { text: btn.dataset.url, width: 128, height: 128, colorDark:"#2C2620", colorLight:"#ffffff" });
-        } else {
-          box.textContent = 'QR Code 產生器載入中，請稍候再試一次。';
-        }
-      }
-    });
-  });
-}
-document.getElementById('mapAdminBtn').addEventListener('click', () => {
-  renderUnitList();
-  materialInput.value = JSON.stringify(UNITS, null, 2);
-  materialErr.style.display = 'none';
-  settingsOverlay.classList.add('open');
-});
-document.getElementById('closeSettingsBtn').addEventListener('click', () => settingsOverlay.classList.remove('open'));
-settingsOverlay.addEventListener('click', (e) => { if(e.target === settingsOverlay) settingsOverlay.classList.remove('open'); });
-document.getElementById('loadDemoBtn').addEventListener('click', () => { materialInput.value = JSON.stringify(DEFAULT_UNITS, null, 2); });
-document.getElementById('applyMaterialBtn').addEventListener('click', () => {
-  try{
-    const parsed = JSON.parse(materialInput.value);
-    if(!Array.isArray(parsed) || parsed.length === 0) throw new Error('units array required');
-    parsed.forEach(u => { if(!u.id || !u.title || !Array.isArray(u.steps)) throw new Error('invalid unit'); });
-    UNITS = parsed;
-    settingsOverlay.classList.remove('open');
-    goHome();
-  }catch(err){
-    materialErr.style.display = 'block';
-  }
-});
-document.getElementById('resetProgressBtn').addEventListener('click', async () => {
-  completedUnits = [];
-  totalXP = 0;
-  renderXp();
-  try{ await window.storage.set('completed-units', JSON.stringify([]), false); }catch(e){}
-  try{ await window.storage.set('total-xp', '0', false); }catch(e){}
-  renderUnitList();
-  renderMap();
-});
 
 boot();
 </script>
