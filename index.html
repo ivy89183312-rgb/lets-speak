@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>Let's SPEAK — AI 口說練習夥伴</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -26,7 +26,8 @@
     --pixel-font: 'Press Start 2P', 'Space Grotesk', monospace;
   }
   *{box-sizing:border-box;}
-  html,body{margin:0;padding:0;}
+  html,body{margin:0;padding:0; overscroll-behavior:none;}
+  html{ -webkit-text-size-adjust:100%; text-size-adjust:100%; touch-action:manipulation; }
   body{
     background: #EDE7DC;
     color: var(--ink);
@@ -35,6 +36,8 @@
     display:flex;
     justify-content:center;
     padding: 24px 12px;
+    touch-action:manipulation;
+    overscroll-behavior:none;
   }
   .app{
     width:100%;
@@ -49,6 +52,7 @@
     box-shadow: 0 50px 90px -30px rgba(0,0,0,0.5);
     position:relative;
     border: 4px solid var(--wood);
+    touch-action:manipulation;
   }
   .screen{display:none; flex-direction:column; height:100%; width:100%;}
   .screen.active{display:flex;}
@@ -99,11 +103,12 @@
 
   /* ---------- Dialogue transcript ---------- */
   .transcript{
-    flex:1; overflow-y:auto; padding: 16px 12px 6px;
+    flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch; padding: 16px 12px 6px;
     display:flex; flex-direction:column; gap:12px;
     background:
       radial-gradient(circle at 15% 10%, rgba(255,255,255,.03), transparent 40%),
       linear-gradient(180deg, #2A1F16, #1C130C 70%);
+    overscroll-behavior:contain;
   }
   .dlg-row{display:flex; gap:8px; align-items:flex-start;}
   .dlg-row.me{flex-direction:row-reverse;}
@@ -129,8 +134,13 @@
   .dlg-box .qlabel{font-family: var(--pixel-font); font-size:8px; color:var(--coral); letter-spacing:.03em; margin-bottom:5px; display:block;}
   .timestamp{font-size:9.5px; color:#8A7A5C; padding: 0 4px;}
 
-  .q-en{font-size:14px; line-height:1.55; transition: filter .2s;}
-  .q-en.blurred{filter: blur(6px); user-select:none;}
+  /* 打碼／亂碼方塊風格（不是模糊，是真的亂碼字元） */
+  .q-en{ transition: none; }
+  .q-en.masked{
+    font-family: var(--pixel-font); font-size:10.5px; line-height:2; letter-spacing:1px;
+    color: var(--gold-dark); user-select:none; word-break:break-all;
+  }
+  .q-en.revealed{ font-family:'Inter',sans-serif; font-size:14px; line-height:1.55; color:var(--ink); }
   .q-zh{font-size:12.5px; color:var(--ink-muted); margin-top:4px;}
   .q-actions{display:flex; gap:8px; margin-top:9px;}
   .mini-action-btn{
@@ -148,11 +158,6 @@
   .reward-card .rc-title{font-family: var(--pixel-font); font-size:9px; color:var(--gold-dark); letter-spacing:.03em; margin-bottom:6px; display:flex; align-items:center; gap:6px;}
   .reward-card .en-line{font-family:'Space Grotesk',sans-serif; font-size:14.5px; color:var(--ink); margin-top:2px;}
   .reward-card .zh-line{color:var(--ink-muted); font-size:12.5px; margin-top:4px;}
-  .tip-card{
-    width:100%; background:rgba(244,234,208,.12); border:2px dashed #6B5A3E; border-radius:6px;
-    padding:10px 13px; color:#D8C6A0; font-size:12.5px;
-  }
-  .tip-card .rc-title{font-family: var(--pixel-font); font-size:8px; color:var(--gold); margin-bottom:4px; display:block;}
   .bubble.system-note{background:transparent; color:#C9B98C; font-size:12px; text-align:center; width:100%; padding:6px 10px;}
 
   .typing-row{display:flex; gap:8px; align-items:flex-start;}
@@ -184,7 +189,7 @@
   textarea#answerInput{
     flex:1; resize:none; background: var(--parchment); color:var(--ink);
     border:3px solid var(--wood-light); border-radius:8px;
-    padding:10px 12px; font-family:'Inter',sans-serif; font-size:14px;
+    padding:10px 12px; font-family:'Inter',sans-serif; font-size:16px;
     max-height:90px; line-height:1.4;
   }
   textarea#answerInput:focus{outline:none; border-color:var(--gold);}
@@ -239,9 +244,10 @@
   .map-title{flex:1; font-family: var(--pixel-font); font-size:11px; color:var(--gold); letter-spacing:.02em; display:flex; align-items:center; gap:6px;}
   .pixel-chip{font-family: var(--pixel-font); font-size:10px; color:var(--wood-dark); background:var(--gold); padding:7px 8px; border-radius:6px; box-shadow: var(--shadow); display:flex; align-items:center; gap:5px; white-space:nowrap; border:2px solid var(--gold-dark);}
   .map-path{
-    position:relative; flex:1; overflow-y:auto; padding: 30px 14px 60px;
+    position:relative; flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch; padding: 30px 14px 60px;
     display:flex; flex-direction:column-reverse; gap:50px;
     background: repeating-conic-gradient(#79B968 0% 25%, #6DA95D 0% 50%) 0 0/26px 26px, linear-gradient(180deg, rgba(0,0,0,0) 60%, rgba(0,0,0,.18) 100%);
+    overscroll-behavior:contain;
   }
   .map-deco{position:absolute; font-size:24px; opacity:.6; pointer-events:none; filter:saturate(.85); text-shadow:0 2px 0 rgba(0,0,0,.15);}
   .path-node-row{display:flex; align-items:center; position:relative; z-index:2;}
@@ -362,35 +368,115 @@
 
 <script>
 /* ============================================================
-   COURSE DATA
+   COURSE DATA — 依教材文件整理：Step 1 觀察題 + Let's SPEAK 情境對話
+   （K1=Validate 清單／Alt=Upgrade 替代說法清單／Continue=延續對話清單）
    ============================================================ */
 const DEFAULT_UNITS = [
-  { id: "restaurant", title: "在餐廳點餐 Dining Out", steps: [
-    { label: "Prompt 1", question: "Have you ever eaten at a restaurant that had a very long wait for a table?", questionZh: "你有沒有在某間餐廳等位子等了很久的經驗？" },
-    { label: "Prompt 2", question: "What do you usually do while you're waiting to be seated?", questionZh: "等待入座的時候，你通常都在做什麼？" },
-    { label: "Prompt 3", question: "What drinks can a diner usually choose from at a restaurant?", questionZh: "在餐廳用餐時，通常有哪些飲料可以選擇？" },
-    { label: "Prompt 4", question: "Do you prefer eating at a restaurant or ordering food delivery? Why?", questionZh: "你比較喜歡在餐廳吃飯，還是叫外送？為什麼？" },
-    { label: "Situation", question: "You are meeting an important client for dinner. The waiter has just brought the menu and is ready to take your order.", questionZh: "你正要和一位重要客戶共進晚餐，服務生剛送上菜單，準備為你點餐。" },
-    { label: "Main Question", question: "What would you say to the waiter to order your meal politely?", questionZh: "你會怎麼禮貌地跟服務生點餐？" }
-  ]},
-  { id: "airport", title: "機場報到 Airport Check-in", steps: [
-    { label: "Prompt 1", question: "Have you ever had a stressful experience at an airport?", questionZh: "你有沒有在機場遇過讓人緊張的經驗？" },
-    { label: "Prompt 2", question: "What do you usually bring with you in your carry-on bag?", questionZh: "你的隨身行李通常都會帶什麼東西？" },
-    { label: "Prompt 3", question: "What documents does a passenger usually need to show at check-in?", questionZh: "旅客在報到時通常需要出示哪些證件？" },
-    { label: "Prompt 4", question: "Do you prefer a window seat or an aisle seat? Why?", questionZh: "你比較喜歡靠窗還是靠走道的座位？為什麼？" },
-    { label: "Situation", question: "You are checking in for an international flight. The check-in agent asks about your luggage.", questionZh: "你正在辦理國際航班的報到手續，地勤人員詢問你行李的狀況。" },
-    { label: "Main Question", question: "What would you say to the agent about your luggage and your seat preference?", questionZh: "關於行李和座位偏好，你會怎麼跟地勤人員說？" }
-  ]},
-  { id: "interview", title: "面試前的閒聊 Interview Small Talk", steps: [
-    { label: "Prompt 1", question: "Have you ever felt nervous before an important meeting?", questionZh: "你有沒有在重要會議前感到緊張過？" },
-    { label: "Prompt 2", question: "What do you usually do to calm your nerves before a big event?", questionZh: "在重要場合前，你通常怎麼讓自己冷靜下來？" },
-    { label: "Prompt 3", question: "What topics are common for small talk before a job interview?", questionZh: "面試前的閒聊，通常會聊哪些話題？" },
-    { label: "Prompt 4", question: "Do you prefer arriving early or right on time for an interview? Why?", questionZh: "面試你比較喜歡提早到，還是準時到？為什麼？" },
-    { label: "Situation", question: "You arrive at the office for a job interview. The receptionist greets you while you wait.", questionZh: "你到公司準備參加面試，等待時櫃檯人員向你打招呼。" },
-    { label: "Main Question", question: "What would you say to make polite small talk with the receptionist?", questionZh: "你會怎麼跟櫃檯人員禮貌地閒聊幾句？" }
-  ]}
+  { id: "unit1", title: "🎂 Personal Preferences",
+    steps: [
+      { label: "Prompt 1", question: "Take a look at the picture. What can you see?", questionZh: "仔細看這張圖片，你看到了什麼？" },
+      { label: "Prompt 2", question: "Can you describe the people in the picture?", questionZh: "你能描述一下圖片中的人物嗎？" },
+      { label: "Prompt 3", question: "What do you think is happening?", questionZh: "你覺得圖片中發生了什麼事？" },
+      { label: "Prompt 4", question: "How do you think the people are feeling?", questionZh: "你覺得圖片中的人感覺如何？" }
+    ],
+    roleplay: {
+      situation: "Your birthday is coming. Your friends want to take you out for dinner.",
+      situationZh: "你的生日快到了，朋友們想帶你出去吃晚餐慶祝。",
+      openingQuestion: "What kind of restaurant do you like? What would you suggest and why?",
+      openingQuestionZh: "你喜歡什麼樣的餐廳？你會建議去哪裡、為什麼？",
+      k1Pool: ["That's a very kind thing to say.", "I'm sure your friend would appreciate that.", "What a nice way to celebrate her birthday.", "Your birthday wishes sound warm and friendly."],
+      altPool: [],
+      continuePool: ["What gift did you buy for your friend?", "How long have you known her?", "What do you like most about your friend?", "What is your friend planning to do after dinner?", "Would you like to take some photos together?", "What is your friend's favourite birthday cake?", "Are there any other surprises planned for the party?", "How do you usually celebrate your own birthday?"]
+    }
+  },
+  { id: "unit2", title: "🍽️ Choosing a Restaurant",
+    steps: [
+      { label: "Prompt 1", question: "What can you see in the picture?", questionZh: "你在圖片中看到了什麼？" },
+      { label: "Prompt 2", question: "What is happening in the picture?", questionZh: "圖片中發生了什麼事？" },
+      { label: "Prompt 3", question: "Who are the people in the picture?", questionZh: "圖片中的人是誰？" },
+      { label: "Prompt 4", question: "Have you ever joined an event like this?", questionZh: "你有沒有參加過類似的活動？" }
+    ],
+    roleplay: {
+      situation: "Teacher's Day is coming next week. You are Class Captain. Your class wants to invite your teacher to dinner.",
+      situationZh: "教師節快到了，你是班長，班上想邀請老師一起吃晚餐。",
+      openingQuestion: "Where should we take Teacher? What restaurant would you suggest and why?",
+      openingQuestionZh: "我們該帶老師去哪裡呢？你會建議哪間餐廳、為什麼？",
+      k1Pool: ["That's a great idea.", "I think Teacher would enjoy that restaurant.", "That sounds like a good choice for our class celebration."],
+      altPool: [],
+      continuePool: ["Why do you think Teacher would like that restaurant?", "What kind of food does Teacher enjoy?", "How many students will join the dinner?", "Should we make a reservation now?", "What date and time would be best for everyone?", "Should we prepare a card or gift for Teacher as well?", "How much should each student contribute?"]
+    }
+  },
+  { id: "unit3", title: "📞 Making a Reservation",
+    steps: [
+      { label: "Prompt 1", question: "What can you see in the picture?", questionZh: "你在圖片中看到了什麼？" },
+      { label: "Prompt 2", question: "What is happening in the picture?", questionZh: "圖片中發生了什麼事？" },
+      { label: "Prompt 3", question: "Who is the person in the picture. What is her job?", questionZh: "圖片中的人是誰？她的工作是什麼？" },
+      { label: "Prompt 4", question: "Have you ever made a booking at a restaurant?", questionZh: "你有沒有向餐廳訂過位？" }
+    ],
+    roleplay: {
+      situation: "Your friend from Singapore is visiting Taiwan with two friends. They want to eat at a famous dumpling restaurant (Din Tai Fung). You need to book a table for four people. You call the restaurant.",
+      situationZh: "你來自新加坡的朋友帶著另外兩位朋友來台灣玩，他們想去知名的小籠包餐廳（鼎泰豐）用餐。你需要訂一張四人桌，於是打電話給餐廳。",
+      openingQuestion: "Good morning. How can I help you?",
+      openingQuestionZh: "早安，請問需要什麼協助呢？",
+      k1Pool: ["Certainly. I'd be happy to help you book a table."],
+      altPool: [],
+      continuePool: ["What date would you like?", "What time would you prefer?", "Would you like a window seat?"]
+    }
+  },
+  { id: "unit4", title: "📖 Ordering Food",
+    steps: [
+      { label: "Prompt 1", question: "What can you see in the picture?", questionZh: "你在圖片（菜單）中看到了什麼？" },
+      { label: "Prompt 2", question: "What courses are included in the lunch special?", questionZh: "午間特餐包含哪些餐點？" },
+      { label: "Prompt 3", question: "What drinks can a diner choose from?", questionZh: "用餐者可以選擇哪些飲料？" },
+      { label: "Prompt 4", question: "Would you like to try this lunch? Why or why not?", questionZh: "你會想嘗試這份午餐嗎？為什麼？" }
+    ],
+    roleplay: {
+      situation: "You are having lunch out with your friends at a popular restaurant. You are looking at the lunch menu. The waitress comes to your table.",
+      situationZh: "你和朋友在一間很受歡迎的餐廳吃午餐，正在看菜單，服務生走到你的桌邊。",
+      openingQuestion: "Hi, my name is Sarah. Are you ready to order? What would you say?",
+      openingQuestionZh: "嗨，我是 Sarah。請問可以點餐了嗎？你會怎麼回答？",
+      k1Pool: ["That sounds like a good choice.", "Excellent. The lunch special is very popular.", "That meal sounds delicious.", "I think you'll enjoy that dish.", "Good choice. Many customers order that for lunch."],
+      altPool: [],
+      continuePool: ["Would you like soup or salad with your meal?", "Which entrée would you like: Chicken Kiev, Fish of the Day, or Lamb Chops?", "What would you like to drink? Coffee, tea, fresh juice, or sparkling mineral water?", "Would you like dessert after your meal?", "Have you tried this restaurant before?", "Why did you choose that dish?", "Would any of your friends like to share an appetizer?", "Do you have any special dietary requirements?", "Would you like me to recommend today's most popular lunch special?", "How would you like your meal prepared?"]
+    }
+  },
+  { id: "unit5", title: "⚠️ Solving a Problem",
+    steps: [
+      { label: "Prompt 1", question: "What can you see in the picture?", questionZh: "你在圖片中看到了什麼？" },
+      { label: "Prompt 2", question: "Who are the people in the picture?", questionZh: "圖片中的人是誰？" },
+      { label: "Prompt 3", question: "How do you think the customer feels? Why?", questionZh: "你覺得顧客的感受如何？為什麼？" },
+      { label: "Prompt 4", question: "Have you ever received the wrong order in a restaurant? What did you do?", questionZh: "你有沒有在餐廳收到過錯誤的餐點？你當時怎麼做？" }
+    ],
+    roleplay: {
+      situation: "You are having lunch in a fast-food restaurant. You ordered a cheeseburger. However, you received a chicken burger. You go to the service counter.",
+      situationZh: "你在速食餐廳吃午餐，點了起司漢堡，卻收到了雞肉漢堡。你走到服務櫃檯。",
+      openingQuestion: "I'm sorry. What seems to be the problem? What would you say?",
+      openingQuestionZh: "不好意思，請問發生什麼問題了呢？你會怎麼說？",
+      k1Pool: ["Good job explaining the problem clearly.", "That's a polite way to tell the server there is a mistake.", "You let the server know that your order is incorrect.", "That's an appropriate response in a restaurant situation."],
+      altPool: ["Excuse me, I think I received the wrong burger.", "I ordered a cheeseburger, but this looks different.", "Could you please check my order?", "I think there has been a mistake with my order.", "Could I have the cheeseburger that I ordered, please?"],
+      continuePool: ["I'm sorry about that. What did you order?"]
+    }
+  },
+  { id: "unit6", title: "🎉 Planning a Banquet",
+    steps: [
+      { label: "Prompt 1", question: "How many people will attend the event? Where are they from?", questionZh: "這場活動有多少人參加？他們來自哪裡？" },
+      { label: "Prompt 2", question: "What are some things that some people cannot eat?", questionZh: "有些人不能吃哪些東西？" },
+      { label: "Prompt 3", question: "Have you ever attended a wedding banquet? What was it like?", questionZh: "你有沒有參加過婚宴？當時感覺如何？" },
+      { label: "Prompt 4", question: "Do you think organizing a banquet would be easy or difficult? Why?", questionZh: "你覺得籌辦一場宴會會很容易還是困難？為什麼？" }
+    ],
+    roleplay: {
+      situation: "You are helping your company organize a banquet. You already know how many guests are coming. Some of the foreign guests have special food requirements. You call the event caterer.",
+      situationZh: "你正在協助公司籌辦一場宴會，已經知道賓客人數，其中有些外國賓客有特殊飲食需求。你打電話給活動餐飲業者。",
+      openingQuestion: "Do any guests have special food needs? What would you say next?",
+      openingQuestionZh: "有沒有賓客有特殊飲食需求呢？接下來你會怎麼說？",
+      k1Pool: ["Good job explaining the guests' dietary requirements clearly.", "You provided the information the banquet manager needed.", "That's a polite and professional response.", "You helped ensure that all guests can enjoy the banquet safely.", "You communicated the special requests effectively."],
+      altPool: ["Yes. We have several guests with special dietary requirements.", "One guest is vegetarian, and another guest does not eat pork.", "We also have a guest with a nut allergy.", "One guest cannot eat dairy products.", "Could you please make suitable arrangements for these guests?", "We would appreciate it if special meals could be prepared.", "I can send you a complete list of dietary requirements by email if necessary."],
+      continuePool: ["Thank you for letting us know.", "We can prepare special meals for those guests.", "Could you please send us the names and requirements?", "We will make sure the kitchen staff are informed.", "Is there anything else we should know before the banquet?"]
+    }
+  }
 ];
 const UNITS = DEFAULT_UNITS;
+const ROLEPLAY_TURNS_REQUIRED = 3;
 
 // 部署好 Worker 之後，把下面這個網址換成你自己的 Worker 網址
 const WORKER_URL = "https://letsspeak.ivy89183312.workers.dev";
@@ -398,7 +484,7 @@ const WORKER_URL = "https://letsspeak.ivy89183312.workers.dev";
 /* ============================================================
    PERSISTENCE (localStorage — 每個學生的瀏覽器各自記錄自己的進度)
    ============================================================ */
-const LS_KEY = 'letsspeak_state_v1';
+const LS_KEY = 'letsspeak_state_v2';
 function loadState(){
   try{
     const raw = localStorage.getItem(LS_KEY);
@@ -413,7 +499,7 @@ function saveState(){
   try{ localStorage.setItem(LS_KEY, JSON.stringify(appState)); }catch(e){ /* storage full/blocked — ignore */ }
 }
 function getUnitState(id){
-  if(!appState.units[id]) appState.units[id] = { stepIndex: 0, completed: false, history: [] };
+  if(!appState.units[id]) appState.units[id] = { stepIndex: 0, completed: false, history: [], roleplayTurn: 0, roleplayDone: false };
   return appState.units[id];
 }
 function isUnitDone(id){
@@ -427,6 +513,8 @@ let appState = loadState();
    ============================================================ */
 let currentUnitIdx = 0;
 let stepIndex = 0;
+let inRoleplay = false;
+let currentRoleplayQuestion = null;
 let collectedSuggestions = [];
 let busy = false;
 let recognizing = false;
@@ -582,12 +670,15 @@ function startUnit(idx, opts){
     state.stepIndex = 0;
     state.completed = false;
     state.history = [];
+    state.roleplayTurn = 0;
+    state.roleplayDone = false;
     saveState();
   }
 
   hasActiveChat = true;
   transcriptEl.innerHTML = '';
-  collectedSuggestions = state.history.map(h => ({ label: h.label, text: h.suggestedAnswer }));
+  collectedSuggestions = state.history.filter(h => h.type !== 'roleplay').map(h => ({ label: h.label, text: h.suggestedAnswer }))
+    .concat(state.history.filter(h => h.type === 'roleplay' && h.altLine).map(h => ({ label: "Let's SPEAK", text: h.altLine })));
 
   if(state.completed){
     renderReviewMode(unit, state);
@@ -595,15 +686,29 @@ function startUnit(idx, opts){
   }
 
   stepIndex = state.stepIndex || 0;
-  state.history.forEach(h => renderHistoryEntry(h));
+  const observeHistory = state.history.filter(h => h.type !== 'roleplay');
+  observeHistory.forEach(h => renderHistoryEntry(h));
+
   mainInputRow.style.display = 'flex';
   askToggle.style.display = 'inline';
-  askCurrentQuestion();
+
+  if(stepIndex < unit.steps.length){
+    inRoleplay = false;
+    askCurrentQuestion();
+  } else if(unit.roleplay && !state.roleplayDone){
+    inRoleplay = true;
+    const roleplayHistory = state.history.filter(h => h.type === 'roleplay');
+    roleplayHistory.forEach(h => renderHistoryEntry(h));
+    resumeRoleplayStage(roleplayHistory);
+  } else {
+    showCompletion();
+  }
 }
 function renderReviewMode(unit, state){
   mainInputRow.style.display = 'none';
   askToggle.style.display = 'none';
   stepIndex = unit.steps.length;
+  inRoleplay = false;
   renderProgress();
   addSystemNote('✅ 你已經完成這一關了，以下是你的作答紀錄：');
   state.history.forEach(h => renderHistoryEntry(h));
@@ -724,41 +829,75 @@ function currentUnit(){ return UNITS[currentUnitIdx]; }
 
 function renderProgress(){
   const unit = currentUnit();
+  const state = getUnitState(unit.id);
   progressBar.innerHTML = '';
   unit.steps.forEach((s, i) => {
     const wrap = document.createElement('div');
     wrap.className = 'node-wrap';
     const node = document.createElement('div');
-    node.className = 'node ' + (i < stepIndex ? 'done' : (i === stepIndex ? 'current' : ''));
+    node.className = 'node ' + (i < stepIndex ? 'done' : (i === stepIndex && !inRoleplay ? 'current' : ''));
     node.textContent = i < stepIndex ? '✓' : (i + 1);
     wrap.appendChild(node);
-    if(i < unit.steps.length - 1){
-      const conn = document.createElement('div');
-      conn.className = 'connector ' + (i < stepIndex ? 'done' : '');
-      wrap.appendChild(conn);
-    }
+    const conn = document.createElement('div');
+    conn.className = 'connector ' + (i < stepIndex ? 'done' : '');
+    wrap.appendChild(conn);
     progressBar.appendChild(wrap);
   });
-  const cur = unit.steps[stepIndex];
-  stepLabelEl.innerHTML = cur
-    ? `LV${currentUnitIdx + 1} 任務 ${stepIndex+1}/${unit.steps.length}　<b>${escapeHtml(cur.label)}</b>`
-    : '關卡完成！';
+  if(unit.roleplay){
+    const wrap = document.createElement('div');
+    wrap.className = 'node-wrap';
+    const node = document.createElement('div');
+    node.className = 'node ' + (state.roleplayDone ? 'done' : (inRoleplay ? 'current' : ''));
+    node.textContent = state.roleplayDone ? '✓' : '🎭';
+    wrap.appendChild(node);
+    progressBar.appendChild(wrap);
+  }
+  const totalCount = unit.steps.length + (unit.roleplay ? 1 : 0);
+  const currentPos = inRoleplay ? unit.steps.length + 1 : Math.min(stepIndex + 1, unit.steps.length);
+  const curStepLabel = unit.steps[stepIndex] ? unit.steps[stepIndex].label : '';
+  stepLabelEl.innerHTML = state.completed
+    ? '關卡完成！'
+    : `LV${currentUnitIdx + 1} 任務 ${currentPos}/${totalCount}　<b>${inRoleplay ? "🎭 Let's SPEAK" : escapeHtml(curStepLabel)}</b>`;
   materialTitleEl.textContent = `LV${currentUnitIdx + 1}：${unit.title}`;
 }
 
-/* ---- Text-to-speech ---- */
+/* ---- Text-to-speech（明確挑選英文語音，避免唸成奇怪的口音/語言） ---- */
+let cachedVoices = [];
+function refreshVoices(){
+  if('speechSynthesis' in window) cachedVoices = window.speechSynthesis.getVoices();
+}
+if('speechSynthesis' in window){
+  refreshVoices();
+  window.speechSynthesis.onvoiceschanged = refreshVoices;
+}
+function pickEnglishVoice(){
+  if(!cachedVoices.length) return null;
+  return cachedVoices.find(v => /en-US/i.test(v.lang) && /google|natural|premium|enhanced/i.test(v.name))
+    || cachedVoices.find(v => /en-US/i.test(v.lang))
+    || cachedVoices.find(v => /^en/i.test(v.lang))
+    || null;
+}
 function speak(text){
   try{
     if(!('speechSynthesis' in window)) return;
+    if(!cachedVoices.length) refreshVoices();
     window.speechSynthesis.cancel();
     const utter = new SpeechSynthesisUtterance(text);
     utter.lang = 'en-US';
-    utter.rate = 0.95;
+    utter.rate = 0.92;
+    utter.pitch = 1;
+    const v = pickEnglishVoice();
+    if(v) utter.voice = v;
     window.speechSynthesis.speak(utter);
   }catch(e){ /* ignore */ }
 }
 
-/* ---- Masked (打碼) question bubble with reveal + replay ---- */
+/* ---- 打碼／亂碼方塊（不是模糊，是真的用亂碼字元置換） ---- */
+const MOSAIC_CHARS = '█▓▒░▚▞▙▟◆';
+function mosaicText(text){
+  return (text || '').replace(/[A-Za-z0-9]/g, () => MOSAIC_CHARS[Math.floor(Math.random() * MOSAIC_CHARS.length)]);
+}
+
 let dlgCounter = 0;
 function addQuestionDialogue(step){
   const id = 'q' + (dlgCounter++);
@@ -769,8 +908,8 @@ function addQuestionDialogue(step){
       <span class="speaker-tag npc">COACH IVY</span>
       <div class="dlg-box">
         <span class="qlabel">📜 ${escapeHtml(step.label)}</span>
-        <div class="q-en blurred" id="${id}-en">${escapeHtml(step.question)}</div>
-        <div class="q-zh" id="${id}-zh" style="display:none;">${escapeHtml(step.questionZh || '')}</div>
+        <div class="q-en masked" id="${id}-en">${mosaicText(step.question)}</div>
+        <div class="q-zh" id="${id}-zh" style="display:none;"></div>
         <div class="q-actions">
           <button class="mini-action-btn" id="${id}-replay">🔊 再聽一次</button>
           <button class="mini-action-btn" id="${id}-reveal">🔍 看文字</button>
@@ -786,13 +925,18 @@ function addQuestionDialogue(step){
     const enEl = document.getElementById(id + '-en');
     const zhEl = document.getElementById(id + '-zh');
     const btn = document.getElementById(id + '-reveal');
-    const isBlurred = enEl.classList.contains('blurred');
-    if(isBlurred){
-      enEl.classList.remove('blurred');
+    const isMasked = enEl.classList.contains('masked');
+    if(isMasked){
+      enEl.textContent = step.question;
+      enEl.classList.remove('masked');
+      enEl.classList.add('revealed');
+      zhEl.textContent = step.questionZh || '';
       zhEl.style.display = 'block';
       btn.textContent = '🙈 隱藏文字';
     } else {
-      enEl.classList.add('blurred');
+      enEl.textContent = mosaicText(step.question);
+      enEl.classList.remove('revealed');
+      enEl.classList.add('masked');
       zhEl.style.display = 'none';
       btn.textContent = '🔍 看文字';
     }
@@ -838,10 +982,20 @@ function addMeMessage(text){
   transcriptEl.scrollTop = transcriptEl.scrollHeight;
 }
 function renderHistoryEntry(h){
+  if(h.type === 'roleplay'){
+    addAiDialogueInstant(`<div>${escapeHtml(h.question)}</div>${h.questionZh ? `<div class="q-zh" style="display:block;">${escapeHtml(h.questionZh)}</div>` : ''}`, '🎭');
+    addMeMessage(h.studentAnswer);
+    addAiDialogueInstant(`<span class="qlabel">🌟 STATUS</span>${escapeHtml(h.positiveFeedback || '')}`);
+    addAiDialogueInstant(escapeHtml(h.validateLine || ''), '🎭');
+    if(h.altLine){
+      addRewardCard('💡 更好的說法', `<div class="en-line">${escapeHtml(h.altLine)}</div>${h.altLineZh ? `<div class="zh-line">${escapeHtml(h.altLineZh)}</div>` : ''}`);
+    }
+    return;
+  }
   addAiDialogueInstant(`<span class="qlabel">📜 ${escapeHtml(h.label)}</span><div>${escapeHtml(h.question)}</div>${h.questionZh ? `<div class="q-zh" style="display:block;">${escapeHtml(h.questionZh)}</div>` : ''}`, '📜');
   addMeMessage(h.studentAnswer);
-  addAiDialogueInstant(`<span class="qlabel">🌟 STATUS</span>${escapeHtml(h.positiveFeedback)}`);
-  addRewardCard('💰 NEW PHRASE UNLOCKED', `<div class="en-line">${escapeHtml(h.suggestedAnswer)}</div>${h.suggestedAnswerZh ? `<div class="zh-line">${escapeHtml(h.suggestedAnswerZh)}</div>` : ''}`);
+  addAiDialogueInstant(`<span class="qlabel">🌟 STATUS</span>${escapeHtml(h.positiveFeedback || '')}`);
+  addRewardCard('💰 NEW PHRASE UNLOCKED', `<div class="en-line">${escapeHtml(h.suggestedAnswer || '')}</div>${h.suggestedAnswerZh ? `<div class="zh-line">${escapeHtml(h.suggestedAnswerZh)}</div>` : ''}`);
   if(h.quickTip){
     addRewardCard('🔎 QUICK TIP', `<div>${escapeHtml(h.quickTip)}</div>`, 'tip-card');
   }
@@ -850,12 +1004,42 @@ function renderHistoryEntry(h){
 function askCurrentQuestion(){
   renderProgress();
   const step = currentUnit().steps[stepIndex];
-  if(!step){ showCompletion(); return; }
+  if(!step){ afterObserveComplete(); return; }
   addQuestionDialogue(step);
   mainInputRow.style.display = 'flex';
   answerInput.value = '';
   answerInput.focus();
 }
+function afterObserveComplete(){
+  const unit = currentUnit();
+  const state = getUnitState(unit.id);
+  if(unit.roleplay && !state.roleplayDone){
+    inRoleplay = true;
+    startRoleplayStage();
+  } else {
+    showCompletion();
+  }
+}
+function startRoleplayStage(){
+  const unit = currentUnit();
+  addSystemNote("🎭 Let's SPEAK — 情境對話開始！");
+  addAiDialogueInstant(`<div>${escapeHtml(unit.roleplay.situation)}</div><div class="q-zh" style="display:block;">${escapeHtml(unit.roleplay.situationZh || '')}</div>`, '🎭');
+  presentRoleplayQuestion({ en: unit.roleplay.openingQuestion, zh: unit.roleplay.openingQuestionZh });
+}
+function resumeRoleplayStage(pastTurns){
+  if(pastTurns.length === 0){ startRoleplayStage(); return; }
+  const last = pastTurns[pastTurns.length - 1];
+  presentRoleplayQuestion({ en: last.nextLine, zh: last.nextLineZh });
+}
+function presentRoleplayQuestion(q){
+  currentRoleplayQuestion = q;
+  renderProgress();
+  addQuestionDialogue({ label: "Let's SPEAK", question: q.en, questionZh: q.zh });
+  mainInputRow.style.display = 'flex';
+  answerInput.value = '';
+  answerInput.focus();
+}
+
 function showCompletion(){
   const state = getUnitState(currentUnit().id);
   state.completed = true;
@@ -932,15 +1116,37 @@ async function askAI(question, askText){
   if(!response.ok || data.error){ console.error('AI proxy error:', data.error); throw new Error(data.error || 'API error'); }
   return data;
 }
+async function getRoleplayTurn(situation, question, answer, k1Pool, altPool, continuePool){
+  const response = await fetch(WORKER_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ mode: "roleplay", situation, question, answer, k1Pool, altPool, continuePool })
+  });
+  const data = await response.json();
+  if(!response.ok || data.error){ console.error('AI proxy error:', data.error); throw new Error(data.error || 'API error'); }
+  return data;
+}
 
 async function submitAnswer(text){
   if(busy) return;
   busy = true;
   sendBtn.disabled = true;
-  const step = currentUnit().steps[stepIndex];
   addMeMessage(text);
   mainInputRow.style.display = 'none';
   showTyping();
+  try{
+    if(inRoleplay){
+      await submitRoleplayAnswer(text);
+    } else {
+      await submitObserveAnswer(text);
+    }
+  }finally{
+    busy = false;
+    sendBtn.disabled = false;
+  }
+}
+async function submitObserveAnswer(text){
+  const step = currentUnit().steps[stepIndex];
   try{
     const result = await getFeedback(step.label, step.question, text);
     hideTyping();
@@ -955,13 +1161,10 @@ async function submitAnswer(text){
 
     const state = getUnitState(currentUnit().id);
     state.history.push({
-      label: step.label,
-      question: step.question,
-      questionZh: step.questionZh || '',
-      studentAnswer: text,
-      positiveFeedback: result.positiveFeedback || '',
-      suggestedAnswer: result.suggestedAnswer || '',
-      suggestedAnswerZh: result.suggestedAnswerZh || '',
+      type: 'observe',
+      label: step.label, question: step.question, questionZh: step.questionZh || '',
+      studentAnswer: text, positiveFeedback: result.positiveFeedback || '',
+      suggestedAnswer: result.suggestedAnswer || '', suggestedAnswerZh: result.suggestedAnswerZh || '',
       quickTip: (result.quickTip && result.quickTip !== 'null') ? result.quickTip : null
     });
     state.stepIndex = stepIndex + 1;
@@ -980,14 +1183,65 @@ async function submitAnswer(text){
       askCurrentQuestion();
     }, { once:true });
   }catch(err){
-    console.error('submitAnswer failed:', err);
+    console.error('submitObserveAnswer failed:', err);
     hideTyping();
     addSystemNote(`回饋產生時發生問題（${escapeHtml(err.message || '未知錯誤')}），請再回答一次試試看。`);
     mainInputRow.style.display = 'flex';
     answerInput.value = text;
-  }finally{
-    busy = false;
-    sendBtn.disabled = false;
+  }
+}
+async function submitRoleplayAnswer(text){
+  const unit = currentUnit();
+  const rp = unit.roleplay;
+  const state = getUnitState(unit.id);
+  try{
+    const result = await getRoleplayTurn(rp.situation, currentRoleplayQuestion.en, text, rp.k1Pool, rp.altPool, rp.continuePool);
+    hideTyping();
+    sfx('success');
+    addAiDialogueInstant(`<span class="qlabel">🌟 STATUS</span>${escapeHtml(result.positiveFeedback || '')}`);
+    await new Promise(r => setTimeout(r, 60));
+    addAiDialogueInstant(escapeHtml(result.validateLine || ''), '🎭');
+    if(result.altLine){
+      addRewardCard('💡 更好的說法', `<div class="en-line">${escapeHtml(result.altLine)}</div><div class="zh-line">${escapeHtml(result.altLineZh || '')}</div>`);
+    }
+
+    const entry = {
+      type: 'roleplay',
+      question: currentRoleplayQuestion.en, questionZh: currentRoleplayQuestion.zh,
+      studentAnswer: text, positiveFeedback: result.positiveFeedback || '', validateLine: result.validateLine || '',
+      altLine: result.altLine || null, altLineZh: result.altLineZh || null,
+      nextLine: result.nextLine || '', nextLineZh: result.nextLineZh || ''
+    };
+    state.history.push(entry);
+    state.roleplayTurn = (state.roleplayTurn || 0) + 1;
+    saveState();
+    if(entry.altLine) collectedSuggestions.push({ label: "Let's SPEAK", text: entry.altLine });
+
+    const isLast = state.roleplayTurn >= ROLEPLAY_TURNS_REQUIRED;
+    const row = document.createElement('div');
+    row.className = 'next-btn-row';
+    row.innerHTML = `<button class="next-btn" id="nextBtn">${isLast ? '🎉 完成這一關 →' : '▶ 繼續對話'}</button>`;
+    transcriptEl.appendChild(row);
+    transcriptEl.scrollTop = transcriptEl.scrollHeight;
+    awardXp(10, row);
+    document.getElementById('nextBtn').addEventListener('click', () => {
+      sfx('click');
+      row.remove();
+      if(isLast){
+        state.roleplayDone = true;
+        saveState();
+        inRoleplay = false;
+        showCompletion();
+      } else {
+        presentRoleplayQuestion({ en: entry.nextLine, zh: entry.nextLineZh });
+      }
+    }, { once:true });
+  }catch(err){
+    console.error('submitRoleplayAnswer failed:', err);
+    hideTyping();
+    addSystemNote(`回饋產生時發生問題（${escapeHtml(err.message || '未知錯誤')}），請再回答一次試試看。`);
+    mainInputRow.style.display = 'flex';
+    answerInput.value = text;
   }
 }
 sendBtn.addEventListener('click', () => {
@@ -1014,7 +1268,7 @@ askToggle.addEventListener('click', () => {
     row.innerHTML = `<div class="reward-card" style="background:linear-gradient(180deg,#F9EFD6,var(--parchment));">
       <div class="rc-title">💬 ASK COACH IVY</div>
       <div style="display:flex; gap:8px; margin-top:6px;">
-        <textarea id="askInput" rows="1" style="flex:1; background:#fff; color:var(--ink); border:2px solid var(--wood-light); border-radius:8px; padding:8px 12px; font-family:'Inter',sans-serif; font-size:13.5px;" placeholder="例如：prefer 是什麼意思？"></textarea>
+        <textarea id="askInput" rows="1" style="flex:1; background:#fff; color:var(--ink); border:2px solid var(--wood-light); border-radius:8px; padding:8px 12px; font-family:'Inter',sans-serif; font-size:16px;" placeholder="例如：prefer 是什麼意思？"></textarea>
         <button class="send-btn" id="askSendBtn">➤</button>
       </div>
     </div>`;
@@ -1028,8 +1282,8 @@ askToggle.addEventListener('click', () => {
       addMeMessage(q);
       showTyping();
       try{
-        const cur = currentUnit().steps[stepIndex];
-        const result = await askAI(cur ? cur.question : '', q);
+        const qCtx = inRoleplay ? (currentRoleplayQuestion ? currentRoleplayQuestion.en : '') : (currentUnit().steps[stepIndex] ? currentUnit().steps[stepIndex].question : '');
+        const result = await askAI(qCtx, q);
         hideTyping();
         addAiDialogueInstant(escapeHtml(result.answer || ''), '💡');
       }catch(err){
@@ -1072,7 +1326,6 @@ if(SpeechRecognitionImpl){
   recognition.onerror = () => { /* 忽略偶發錯誤，交給 onend 處理是否要自動重啟 */ };
   recognition.onend = () => {
     if(!manualStopRecognition){
-      // 使用者還沒按停止，瀏覽器自己斷線（例如短暫沒偵測到聲音）→ 自動重新開始聆聽
       try{ recognition.start(); }catch(e){ /* ignore */ }
     } else {
       recognizing = false;
