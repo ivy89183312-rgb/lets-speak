@@ -384,6 +384,7 @@
    ============================================================ */
 const DEFAULT_UNITS = [
   { id: "unit1", title: "🎂 Personal Preferences", image: "img/unit1.png",
+    imageDescription: "A group of friends celebrating a birthday dinner at a cozy restaurant lit with string lights. A young woman covers her mouth in delighted surprise as a young man wearing an apron (a waiter) presents her with a chocolate birthday cake topped with lit candles. The other friends around the table are clapping and smiling. The table is set with plates of food, flowers, and glasses of water.",
     steps: [
       { label: "Prompt 1", question: "Take a look at the picture. What can you see?", questionZh: "仔細看這張圖片，你看到了什麼？" },
       { label: "Prompt 2", question: "Can you describe the people in the picture?", questionZh: "你能描述一下圖片中的人物嗎？" },
@@ -401,6 +402,7 @@ const DEFAULT_UNITS = [
     }
   },
   { id: "unit2", title: "🍽️ Choosing a Restaurant", image: "img/unit2.png",
+    imageDescription: "A group of coworkers or classmates sitting around a large round table at a Chinese restaurant, clapping and smiling toward a man in the center (their teacher). Behind them hangs a red banner reading '教師節快樂！老師，謝謝您！' (Happy Teacher's Day! Thank you, Teacher!). In front of the teacher is a small cake with a lit candle and a bouquet of flowers, and the table is filled with several dishes of Chinese food and cups of tea.",
     steps: [
       { label: "Prompt 1", question: "What can you see in the picture?", questionZh: "你在圖片中看到了什麼？" },
       { label: "Prompt 2", question: "What is happening in the picture?", questionZh: "圖片中發生了什麼事？" },
@@ -418,6 +420,7 @@ const DEFAULT_UNITS = [
     }
   },
   { id: "unit3", title: "📞 Making a Reservation", image: "img/unit3.png",
+    imageDescription: "A restaurant hostess/manager wearing a headset, sitting at a reservations desk and smiling while talking on the phone. Behind her are signs reading 'WELCOME – PLEASE LET US KNOW IF YOU HAVE ANY SPECIAL REQUESTS' and 'RESERVATIONS – PLEASE WAIT TO BE SEATED'. A reservation book and a pen are on the desk in front of her, along with a computer monitor.",
     steps: [
       { label: "Prompt 1", question: "What can you see in the picture?", questionZh: "你在圖片中看到了什麼？" },
       { label: "Prompt 2", question: "What is happening in the picture?", questionZh: "圖片中發生了什麼事？" },
@@ -435,6 +438,7 @@ const DEFAULT_UNITS = [
     }
   },
   { id: "unit4", title: "📖 Ordering Food", image: "img/unit4.png",
+    imageDescription: "A restaurant chalkboard menu titled 'LUNCH SPECIALS'. It lists: Appetizer – Onion Soup; Entrée (choice of one) – Chicken Kiev, Pan Fried Fish of the Day, or New Zealand Lamb Chops; Dessert – Tiramisu; Beverage (choice of one) – Coffee, Tea, Fresh Juice, or Sparkling Mineral Water. The board has decorative chalk drawings of the food items and hangs beside a lantern with greenery around it.",
     steps: [
       { label: "Prompt 1", question: "What can you see in the picture?", questionZh: "你在圖片（菜單）中看到了什麼？" },
       { label: "Prompt 2", question: "What courses are included in the lunch special?", questionZh: "午間特餐包含哪些餐點？" },
@@ -452,6 +456,7 @@ const DEFAULT_UNITS = [
     }
   },
   { id: "unit5", title: "⚠️ Solving a Problem", image: "img/unit5.png",
+    imageDescription: "A customer at a fast-food restaurant counter, holding up a burger and pointing at it with a frustrated or confused expression while talking to a young staff member behind the counter (seen from behind, wearing a cap). On the counter are a bag of food, French fries, and a drink with a straw. Menu boards with burger photos are visible in the background.",
     steps: [
       { label: "Prompt 1", question: "What can you see in the picture?", questionZh: "你在圖片中看到了什麼？" },
       { label: "Prompt 2", question: "Who are the people in the picture?", questionZh: "圖片中的人是誰？" },
@@ -469,6 +474,7 @@ const DEFAULT_UNITS = [
     }
   },
   { id: "unit6", title: "🎉 Planning a Banquet", image: "img/unit6.png",
+    imageDescription: "A formal 'Banquet Response Summary' document. Banquet details: Date – November 10; Time – 6:00 PM to 10:00 PM; Venue – Grandview Hotel, Crystal Ballroom. Response overview: 24 respondents, 6 foreign guests, 18 from the company. A dietary requirements table lists: Ms. Sato – Vegetarian; Mr. Ali – Muslim, No Pork; Ms. Hannan – Nut Allergy; Mr. Carter – No Dairy Products. It is signed by Emily Johnson, Banquet Coordinator, dated May 28, 2025.",
     steps: [
       { label: "Prompt 1", question: "How many people will attend the event? Where are they from?", questionZh: "這場活動有多少人參加？他們來自哪裡？" },
       { label: "Prompt 2", question: "What are some things that some people cannot eat?", questionZh: "有些人不能吃哪些東西？" },
@@ -1118,11 +1124,13 @@ function hideTyping(){ const el = document.getElementById('typingRow'); if(el) e
 /* ============================================================
    AI CALLS (via your own Cloudflare Worker + Gemini API)
    ============================================================ */
-async function getFeedback(label, question, answer){
+async function getFeedback(label, question, answer, imageDescription){
+  const body = { mode: "feedback", label, question, answer };
+  if(imageDescription){ body.imageDescription = imageDescription; }
   const response = await fetch(WORKER_URL, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ mode: "feedback", label, question, answer })
+    body: JSON.stringify(body)
   });
   const data = await response.json();
   if(!response.ok || data.error){ console.error('AI proxy error:', data.error); throw new Error(data.error || 'API error'); }
@@ -1170,7 +1178,7 @@ async function submitAnswer(text){
 async function submitObserveAnswer(text){
   const step = currentUnit().steps[stepIndex];
   try{
-    const result = await getFeedback(step.label, step.question, text);
+    const result = await getFeedback(step.label, step.question, text, currentUnit().imageDescription);
     hideTyping();
     sfx('success');
     addAiDialogueInstant(`<span class="qlabel">🌟 STATUS</span>${escapeHtml(result.positiveFeedback || '')}`);
