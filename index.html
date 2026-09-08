@@ -192,9 +192,57 @@
 
   /* ---------- Command bar (input) ---------- */
   .input-bar{border-top:4px solid var(--wood); padding: 10px 12px 12px; background: var(--wood-dark); display:flex; flex-direction:column; gap:8px;}
-  .ask-row{display:flex; justify-content:center;}
-  .ask-link{background:none;border:none;color:#B7A57E; font-family: var(--pixel-font); font-size:8.5px; cursor:pointer; letter-spacing:.02em;}
-  .ask-link:hover{color:var(--gold);}
+  .ask-row{display:none;}
+
+  /* ---------- Ask-the-Sage floating help widget ---------- */
+  .help-fab{
+    position:absolute; right:14px; bottom:96px; z-index:22;
+    width:52px; height:52px; border-radius:50%;
+    background: var(--gold); border:3px solid var(--gold-dark);
+    display:flex; align-items:center; justify-content:center; font-size:24px;
+    box-shadow: var(--shadow); cursor:pointer; animation: fabBounce 2.4s infinite;
+  }
+  .help-fab:active{transform:translateY(1px);}
+  @keyframes fabBounce{0%,100%{transform:translateY(0);}50%{transform:translateY(-5px);}}
+  .help-fab .fab-badge{
+    position:absolute; top:-3px; right:-3px; background:var(--coral); color:#fff;
+    font-family: var(--pixel-font); font-size:7px; width:16px; height:16px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center; border:2px solid var(--wood-dark);
+  }
+  .help-widget{
+    position:absolute; right:14px; bottom:96px; z-index:23;
+    width: calc(100% - 28px); max-width:320px; height:60%; max-height:420px;
+    background: var(--wood-dark); border:4px solid var(--wood); border-radius:12px;
+    display:none; flex-direction:column; overflow:hidden;
+    box-shadow: 0 24px 50px rgba(0,0,0,.45);
+  }
+  .help-widget.open{display:flex;}
+  .help-widget-header{
+    background: linear-gradient(180deg,var(--wood-light),var(--wood));
+    padding:10px 12px; display:flex; align-items:center; gap:8px; border-bottom:3px solid var(--wood-dark); flex-shrink:0;
+  }
+  .help-widget-header .mini-avatar{
+    width:30px; height:30px; border-radius:7px; background:var(--gold); border:2px solid var(--gold-dark);
+    display:flex; align-items:center; justify-content:center; font-size:15px; flex-shrink:0;
+  }
+  .help-widget-title{flex:1; min-width:0;}
+  .help-widget-title .t1{font-family: var(--pixel-font); font-size:10px; color:var(--gold); display:block;}
+  .help-widget-title .t2{font-size:10px; color:#B7A57E; margin-top:2px; display:flex; align-items:center; gap:4px;}
+  .help-widget-close{background:var(--wood-light); border:2px solid var(--wood-dark); color:var(--gold); width:26px; height:26px; border-radius:6px; font-size:13px; cursor:pointer; flex-shrink:0;}
+  .help-widget-body{
+    flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch; padding:12px; display:flex; flex-direction:column; gap:10px;
+    background: radial-gradient(circle at 15% 10%, rgba(255,255,255,.03), transparent 40%), linear-gradient(180deg, #2A1F16, #1C130C 70%);
+  }
+  .help-widget-input-row{display:flex; gap:6px; padding:8px 10px; border-top:3px solid var(--wood); background:var(--wood-dark); flex-shrink:0;}
+  .help-widget-input-row textarea{
+    flex:1; resize:none; background:var(--parchment); border:2px solid var(--wood-light); border-radius:8px;
+    padding:8px 10px; font-size:16px; font-family:'Inter',sans-serif; max-height:64px; line-height:1.35;
+  }
+  .help-widget-input-row textarea:focus{outline:none; border-color:var(--gold);}
+  .help-widget-input-row button{
+    width:36px; height:36px; border-radius:8px; border:2px solid var(--gold-dark);
+    background:var(--gold); color:var(--wood-dark); cursor:pointer; flex-shrink:0; font-size:14px;
+  }
   .input-row{display:flex; align-items:flex-end; gap:8px;}
   .cmd-prompt{font-family: var(--pixel-font); font-size:12px; color:var(--gold); padding-bottom:12px;}
   textarea#answerInput{
@@ -341,8 +389,24 @@
 
     <div class="transcript" id="transcript"></div>
 
+    <button class="help-fab" id="helpFab" title="詢問英文問題">🧙<span class="fab-badge">?</span></button>
+    <div class="help-widget" id="helpWidget">
+      <div class="help-widget-header">
+        <div class="mini-avatar">🧙</div>
+        <div class="help-widget-title">
+          <span class="t1">ASK THE SAGE</span>
+          <span class="t2"><span class="status-dot"></span>隨時可以問文法／單字</span>
+        </div>
+        <button class="help-widget-close" id="helpCloseBtn">✕</button>
+      </div>
+      <div class="help-widget-body" id="helpBody"></div>
+      <div class="help-widget-input-row">
+        <textarea id="helpInput" rows="1" placeholder="例如：prefer 是什麼意思？"></textarea>
+        <button id="helpSendBtn">➤</button>
+      </div>
+    </div>
+
     <div class="input-bar">
-      <div class="ask-row"><button class="ask-link" id="askToggle">💬 詢問一個英文問題</button></div>
       <div class="input-row" id="mainInputRow">
         <span class="cmd-prompt">&gt;</span>
         <textarea id="answerInput" rows="1" placeholder="輸入你的回答…"></textarea>
@@ -556,7 +620,6 @@ const answerInput = document.getElementById('answerInput');
 const sendBtn = document.getElementById('sendBtn');
 const micBtn = document.getElementById('micBtn');
 const mainInputRow = document.getElementById('mainInputRow');
-const askToggle = document.getElementById('askToggle');
 const reminderScreen = document.getElementById('reminderScreen');
 const xpBadgeEl = document.getElementById('xpBadge');
 const mapXpBadgeEl = document.getElementById('mapXpBadge');
@@ -708,7 +771,6 @@ function startUnit(idx, opts){
   observeHistory.forEach(h => renderHistoryEntry(h));
 
   mainInputRow.style.display = 'flex';
-  askToggle.style.display = 'inline';
 
   if(stepIndex < unit.steps.length){
     inRoleplay = false;
@@ -724,7 +786,6 @@ function startUnit(idx, opts){
 }
 function renderReviewMode(unit, state){
   mainInputRow.style.display = 'none';
-  askToggle.style.display = 'none';
   stepIndex = unit.steps.length;
   inRoleplay = false;
   renderProgress();
@@ -917,13 +978,16 @@ function mosaicText(text){
 }
 
 let dlgCounter = 0;
-function addQuestionDialogue(step){
+function addQuestionDialogue(step, opts){
+  opts = opts || {};
+  const portrait = opts.portrait || '📜';
+  const tag = opts.tag || 'COACH IVY';
   const id = 'q' + (dlgCounter++);
   const row = document.createElement('div');
   row.className = 'dlg-row';
-  row.innerHTML = `<div class="dlg-portrait">📜</div>
+  row.innerHTML = `<div class="dlg-portrait">${portrait}</div>
     <div class="dlg-col">
-      <span class="speaker-tag npc">COACH IVY</span>
+      <span class="speaker-tag npc">${escapeHtml(tag)}</span>
       <div class="dlg-box">
         <span class="qlabel">📜 ${escapeHtml(step.label)}</span>
         <div class="q-en masked" id="${id}-en">${mosaicText(step.question)}</div>
@@ -948,8 +1012,7 @@ function addQuestionDialogue(step){
       enEl.textContent = step.question;
       enEl.classList.remove('masked');
       enEl.classList.add('revealed');
-      zhEl.textContent = step.questionZh || '';
-      zhEl.style.display = 'block';
+      if(step.questionZh){ zhEl.textContent = step.questionZh; zhEl.style.display = 'block'; } else { zhEl.style.display = 'none'; }
       btn.textContent = '🙈 隱藏文字';
     } else {
       enEl.textContent = mosaicText(step.question);
@@ -1011,13 +1074,12 @@ function addMeMessage(text){
 }
 function renderHistoryEntry(h){
   if(h.type === 'roleplay'){
-    addAiDialogueInstant(`<div>${escapeHtml(h.question)}</div>${h.questionZh ? `<div class="q-zh" style="display:block;">${escapeHtml(h.questionZh)}</div>` : ''}`, '🎭');
+    addAiDialogueInstant(`<div>${escapeHtml(h.question)}</div>`, '🎭');
     addMeMessage(h.studentAnswer);
-    addAiDialogueInstant(`<span class="qlabel">🌟 STATUS</span>${escapeHtml(h.positiveFeedback || '')}`);
-    addAiDialogueInstant(escapeHtml(h.validateLine || ''), '🎭');
     if(h.altLine){
       addRewardCard('💡 更好的說法', `<div class="en-line">${escapeHtml(h.altLine)}</div>${h.altLineZh ? `<div class="zh-line">${escapeHtml(h.altLineZh)}</div>` : ''}`);
     }
+    addAiDialogueInstant(`<div>${escapeHtml(h.reply || '')}</div>`, '🎭');
     return;
   }
   addAiDialogueInstant(`<span class="qlabel">📜 ${escapeHtml(h.label)}</span><div>${escapeHtml(h.question)}</div>${h.questionZh ? `<div class="q-zh" style="display:block;">${escapeHtml(h.questionZh)}</div>` : ''}`, '📜');
@@ -1057,12 +1119,12 @@ function startRoleplayStage(){
 function resumeRoleplayStage(pastTurns){
   if(pastTurns.length === 0){ startRoleplayStage(); return; }
   const last = pastTurns[pastTurns.length - 1];
-  presentRoleplayQuestion({ en: last.nextLine, zh: last.nextLineZh });
+  presentRoleplayQuestion({ en: last.reply, zh: '' });
 }
 function presentRoleplayQuestion(q){
   currentRoleplayQuestion = q;
   renderProgress();
-  addQuestionDialogue({ label: "Let's SPEAK", question: q.en, questionZh: q.zh });
+  addQuestionDialogue({ label: "Let's SPEAK", question: q.en, questionZh: q.zh }, { portrait: '🎭', tag: 'IN CHARACTER' });
   mainInputRow.style.display = 'flex';
   answerInput.value = '';
   answerInput.focus();
@@ -1074,7 +1136,6 @@ function showCompletion(){
   state.stepIndex = currentUnit().steps.length;
   saveState();
   mainInputRow.style.display = 'none';
-  askToggle.style.display = 'none';
   sfx('levelup');
   let listHtml = collectedSuggestions.map(s => `<li><b>${escapeHtml(s.label)}:</b> ${escapeHtml(s.text)}</li>`).join('');
   const bonusXp = 30;
@@ -1228,19 +1289,18 @@ async function submitRoleplayAnswer(text){
     const result = await getRoleplayTurn(rp.situation, currentRoleplayQuestion.en, text, rp.k1Pool, rp.altPool, rp.continuePool);
     hideTyping();
     sfx('success');
-    addAiDialogueInstant(`<span class="qlabel">🌟 STATUS</span>${escapeHtml(result.positiveFeedback || '')}`);
-    await new Promise(r => setTimeout(r, 60));
-    addAiDialogueInstant(escapeHtml(result.validateLine || ''), '🎭');
     if(result.altLine){
       addRewardCard('💡 更好的說法', `<div class="en-line">${escapeHtml(result.altLine)}</div><div class="zh-line">${escapeHtml(result.altLineZh || '')}</div>`);
+      await new Promise(r => setTimeout(r, 60));
     }
 
     const entry = {
       type: 'roleplay',
-      question: currentRoleplayQuestion.en, questionZh: currentRoleplayQuestion.zh,
-      studentAnswer: text, positiveFeedback: result.positiveFeedback || '', validateLine: result.validateLine || '',
-      altLine: result.altLine || null, altLineZh: result.altLineZh || null,
-      nextLine: result.nextLine || '', nextLineZh: result.nextLineZh || ''
+      question: currentRoleplayQuestion.en,
+      studentAnswer: text,
+      reply: result.reply || '',
+      altLine: result.altLine || null,
+      altLineZh: result.altLineZh || null
     };
     state.history.push(entry);
     state.roleplayTurn = (state.roleplayTurn || 0) + 1;
@@ -1248,24 +1308,26 @@ async function submitRoleplayAnswer(text){
     if(entry.altLine) collectedSuggestions.push({ label: "Let's SPEAK", text: entry.altLine });
 
     const isLast = state.roleplayTurn >= ROLEPLAY_TURNS_REQUIRED;
-    const row = document.createElement('div');
-    row.className = 'next-btn-row';
-    row.innerHTML = `<button class="next-btn" id="nextBtn">${isLast ? '🎉 完成這一關 →' : '▶ 繼續對話'}</button>`;
-    transcriptEl.appendChild(row);
-    transcriptEl.scrollTop = transcriptEl.scrollHeight;
-    awardXp(10, row);
-    document.getElementById('nextBtn').addEventListener('click', () => {
-      sfx('click');
-      row.remove();
-      if(isLast){
+    if(isLast){
+      const row = document.createElement('div');
+      row.className = 'next-btn-row';
+      row.innerHTML = `<button class="next-btn" id="nextBtn">🎉 完成這一關 →</button>`;
+      transcriptEl.appendChild(row);
+      transcriptEl.scrollTop = transcriptEl.scrollHeight;
+      awardXp(10, row);
+      document.getElementById('nextBtn').addEventListener('click', () => {
+        sfx('click');
+        row.remove();
         state.roleplayDone = true;
         saveState();
         inRoleplay = false;
         showCompletion();
-      } else {
-        presentRoleplayQuestion({ en: entry.nextLine, zh: entry.nextLineZh });
-      }
-    }, { once:true });
+      }, { once:true });
+    } else {
+      awardXp(10, null);
+      // 直接順著往下聊，不用額外按「繼續」——像真人對話一樣自然接下去
+      presentRoleplayQuestion({ en: entry.reply, zh: '' });
+    }
   }catch(err){
     console.error('submitRoleplayAnswer failed:', err);
     hideTyping();
@@ -1284,52 +1346,77 @@ answerInput.addEventListener('keydown', (e) => {
   if(e.key === 'Enter' && !e.shiftKey){ e.preventDefault(); sendBtn.click(); }
 });
 
-/* ---------------- Ask-a-question side flow ---------------- */
-let askOpen = false;
-askToggle.addEventListener('click', () => {
+/* ---------------- Ask the Sage — floating help widget ---------------- */
+const helpFab = document.getElementById('helpFab');
+const helpWidget = document.getElementById('helpWidget');
+const helpBody = document.getElementById('helpBody');
+const helpInput = document.getElementById('helpInput');
+const helpSendBtn = document.getElementById('helpSendBtn');
+let helpOpen = false;
+let helpGreeted = false;
+let helpBusy = false;
+
+function addHelpBubble(text, who){
+  const row = document.createElement('div');
+  row.className = 'dlg-row' + (who === 'me' ? ' me' : '');
+  const portrait = who === 'me' ? '🗡️' : '🧙';
+  const tagClass = who === 'me' ? 'player' : 'npc';
+  const tagText = who === 'me' ? 'YOU' : 'SAGE';
+  row.innerHTML = `<div class="dlg-portrait">${portrait}</div>
+    <div class="dlg-col"><span class="speaker-tag ${tagClass}">${tagText}</span><div class="dlg-box">${escapeHtml(text)}</div></div>`;
+  helpBody.appendChild(row);
+  helpBody.scrollTop = helpBody.scrollHeight;
+}
+function showHelpTyping(){
+  const row = document.createElement('div');
+  row.className = 'typing-row';
+  row.id = 'helpTypingRow';
+  row.innerHTML = `<div class="dlg-portrait">🧙</div><div class="typing-box"><span></span><span></span><span></span></div>`;
+  helpBody.appendChild(row);
+  helpBody.scrollTop = helpBody.scrollHeight;
+}
+function hideHelpTyping(){ const el = document.getElementById('helpTypingRow'); if(el) el.remove(); }
+
+helpFab.addEventListener('click', () => {
   sfx('click');
-  askOpen = !askOpen;
-  if(askOpen){
-    askToggle.textContent = '✕ 收起提問';
-    mainInputRow.style.display = 'none';
-    const row = document.createElement('div');
-    row.className = 'full-row';
-    row.id = 'askRow';
-    row.innerHTML = `<div class="reward-card" style="background:linear-gradient(180deg,#F9EFD6,var(--parchment));">
-      <div class="rc-title">💬 ASK COACH IVY</div>
-      <div style="display:flex; gap:8px; margin-top:6px;">
-        <textarea id="askInput" rows="1" style="flex:1; background:#fff; color:var(--ink); border:2px solid var(--wood-light); border-radius:8px; padding:8px 12px; font-family:'Inter',sans-serif; font-size:16px;" placeholder="例如：prefer 是什麼意思？"></textarea>
-        <button class="send-btn" id="askSendBtn">➤</button>
-      </div>
-    </div>`;
-    transcriptEl.appendChild(row);
-    transcriptEl.scrollTop = transcriptEl.scrollHeight;
-    document.getElementById('askSendBtn').addEventListener('click', async () => {
-      const q = document.getElementById('askInput').value.trim();
-      if(!q) return;
-      sfx('send');
-      row.remove();
-      addMeMessage(q);
-      showTyping();
-      try{
-        const qCtx = inRoleplay ? (currentRoleplayQuestion ? currentRoleplayQuestion.en : '') : (currentUnit().steps[stepIndex] ? currentUnit().steps[stepIndex].question : '');
-        const result = await askAI(qCtx, q);
-        hideTyping();
-        addAiDialogueInstant(escapeHtml(result.answer || ''), '💡');
-      }catch(err){
-        hideTyping();
-        addSystemNote('回答時發生問題，請再試一次。');
-      }
-      askOpen = false;
-      askToggle.textContent = '💬 詢問一個英文問題';
-      mainInputRow.style.display = 'flex';
-    });
-  } else {
-    askToggle.textContent = '💬 詢問一個英文問題';
-    const r = document.getElementById('askRow');
-    if(r) r.remove();
-    mainInputRow.style.display = 'flex';
+  helpOpen = !helpOpen;
+  helpWidget.classList.toggle('open', helpOpen);
+  if(helpOpen){
+    if(!helpGreeted){
+      addHelpBubble('嗨，我是智者 Sage！練習中如果有文法、單字、說法看不懂的地方，都可以問我 🧙', 'npc');
+      helpGreeted = true;
+    }
+    helpInput.focus();
   }
+});
+document.getElementById('helpCloseBtn').addEventListener('click', () => {
+  sfx('click');
+  helpOpen = false;
+  helpWidget.classList.remove('open');
+});
+async function sendHelpQuestion(){
+  const q = helpInput.value.trim();
+  if(!q || helpBusy) return;
+  helpBusy = true;
+  sfx('send');
+  helpInput.value = '';
+  addHelpBubble(q, 'me');
+  showHelpTyping();
+  try{
+    const qCtx = inRoleplay ? (currentRoleplayQuestion ? currentRoleplayQuestion.en : '') : (currentUnit().steps[stepIndex] ? currentUnit().steps[stepIndex].question : '');
+    const result = await askAI(qCtx, q);
+    hideHelpTyping();
+    addHelpBubble(result.answer || '', 'npc');
+  }catch(err){
+    hideHelpTyping();
+    addHelpBubble('回答時發生問題，請再試一次。', 'npc');
+  }finally{
+    helpBusy = false;
+  }
+}
+helpSendBtn.addEventListener('click', sendHelpQuestion);
+helpInput.addEventListener('keydown', (e) => {
+  if(e.key === 'Enter' && !e.shiftKey){ e.preventDefault(); sendHelpQuestion(); }
 });
 
 /* ---------------- Voice input (continuous — 只有按停止才會停) ---------------- */
