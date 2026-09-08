@@ -958,17 +958,31 @@ function pickEnglishVoice(){
 }
 function speak(text){
   try{
-    if(!('speechSynthesis' in window)) return;
+    if(!('speechSynthesis' in window)){ console.warn('[speak] speechSynthesis 這個瀏覽器不支援'); return; }
     if(!cachedVoices.length) refreshVoices();
+    // Chrome 有已知 bug：語音引擎閒置一段時間後會卡在「正在說話」的假狀態，
+    // 導致之後的 speak() 完全沒反應也不報錯。先 cancel + resume 可以解開這個卡住的狀態。
     window.speechSynthesis.cancel();
+    if(window.speechSynthesis.paused) window.speechSynthesis.resume();
     const utter = new SpeechSynthesisUtterance(text);
     utter.lang = 'en-US';
     utter.rate = 0.92;
     utter.pitch = 1;
     const v = pickEnglishVoice();
     if(v) utter.voice = v;
+    utter.onerror = (e) => console.error('[speak] speechSynthesis 播放失敗:', e.error || e);
+    utter.onstart = () => console.log('[speak] 開始播放:', text.slice(0, 30));
     window.speechSynthesis.speak(utter);
-  }catch(e){ /* ignore */ }
+    // 保險機制：如果 200ms 後瀏覽器仍未真的開始播放（卡住的典型徵兆），
+    // 再強制 cancel 一次讓佇列重新啟動。
+    setTimeout(() => {
+      if(!window.speechSynthesis.speaking && !window.speechSynthesis.pending){
+        console.warn('[speak] 似乎沒有真的開始播放，嘗試重新觸發一次');
+        window.speechSynthesis.cancel();
+        window.speechSynthesis.speak(utter);
+      }
+    }, 200);
+  }catch(e){ console.error('[speak] 發生例外:', e); }
 }
 
 /* ---- 打碼／亂碼方塊（不是模糊，是真的用亂碼字元置換） ---- */
