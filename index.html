@@ -1074,12 +1074,12 @@ function addMeMessage(text){
 }
 function renderHistoryEntry(h){
   if(h.type === 'roleplay'){
-    addAiDialogueInstant(`<div>${escapeHtml(h.question)}</div>`, '🎭');
+    addAiDialogueInstant(`<div>${escapeHtml(h.question)}</div>${h.questionZh ? `<div class="q-zh" style="display:block;">${escapeHtml(h.questionZh)}</div>` : ''}`, '🎭');
     addMeMessage(h.studentAnswer);
     if(h.altLine){
       addRewardCard('💡 更好的說法', `<div class="en-line">${escapeHtml(h.altLine)}</div>${h.altLineZh ? `<div class="zh-line">${escapeHtml(h.altLineZh)}</div>` : ''}`);
     }
-    addAiDialogueInstant(`<div>${escapeHtml(h.reply || '')}</div>`, '🎭');
+    addAiDialogueInstant(`<div>${escapeHtml(h.reply || '')}</div>${h.replyZh ? `<div class="q-zh" style="display:block;">${escapeHtml(h.replyZh)}</div>` : ''}`, '🎭');
     return;
   }
   addAiDialogueInstant(`<span class="qlabel">📜 ${escapeHtml(h.label)}</span><div>${escapeHtml(h.question)}</div>${h.questionZh ? `<div class="q-zh" style="display:block;">${escapeHtml(h.questionZh)}</div>` : ''}`, '📜');
@@ -1119,7 +1119,7 @@ function startRoleplayStage(){
 function resumeRoleplayStage(pastTurns){
   if(pastTurns.length === 0){ startRoleplayStage(); return; }
   const last = pastTurns[pastTurns.length - 1];
-  presentRoleplayQuestion({ en: last.reply, zh: '' });
+  presentRoleplayQuestion({ en: last.reply, zh: last.replyZh || '' });
 }
 function presentRoleplayQuestion(q){
   currentRoleplayQuestion = q;
@@ -1207,11 +1207,11 @@ async function askAI(question, askText){
   if(!response.ok || data.error){ console.error('AI proxy error:', data.error); throw new Error(data.error || 'API error'); }
   return data;
 }
-async function getRoleplayTurn(situation, question, answer, k1Pool, altPool, continuePool){
+async function getRoleplayTurn(situation, question, answer, k1Pool, altPool, continuePool, isFinalTurn){
   const response = await fetch(WORKER_URL, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ mode: "roleplay", situation, question, answer, k1Pool, altPool, continuePool })
+    body: JSON.stringify({ mode: "roleplay", situation, question, answer, k1Pool, altPool, continuePool, isFinalTurn: !!isFinalTurn })
   });
   const data = await response.json();
   if(!response.ok || data.error){ console.error('AI proxy error:', data.error); throw new Error(data.error || 'API error'); }
@@ -1285,8 +1285,10 @@ async function submitRoleplayAnswer(text){
   const unit = currentUnit();
   const rp = unit.roleplay;
   const state = getUnitState(unit.id);
+  const turnNumber = (state.roleplayTurn || 0) + 1;
+  const isLast = turnNumber >= ROLEPLAY_TURNS_REQUIRED;
   try{
-    const result = await getRoleplayTurn(rp.situation, currentRoleplayQuestion.en, text, rp.k1Pool, rp.altPool, rp.continuePool);
+    const result = await getRoleplayTurn(rp.situation, currentRoleplayQuestion.en, text, rp.k1Pool, rp.altPool, rp.continuePool, isLast);
     hideTyping();
     sfx('success');
     if(result.altLine){
@@ -1297,18 +1299,23 @@ async function submitRoleplayAnswer(text){
     const entry = {
       type: 'roleplay',
       question: currentRoleplayQuestion.en,
+      questionZh: currentRoleplayQuestion.zh,
       studentAnswer: text,
       reply: result.reply || '',
+      replyZh: result.replyZh || '',
       altLine: result.altLine || null,
       altLineZh: result.altLineZh || null
     };
     state.history.push(entry);
-    state.roleplayTurn = (state.roleplayTurn || 0) + 1;
+    state.roleplayTurn = turnNumber;
     saveState();
     if(entry.altLine) collectedSuggestions.push({ label: "Let's SPEAK", text: entry.altLine });
 
-    const isLast = state.roleplayTurn >= ROLEPLAY_TURNS_REQUIRED;
+    // AI 一律先把這輪的話說完（打碼＋聽力＋可看文字），最後一輪由 AI 收尾結束對話
+    addQuestionDialogue({ label: "Let's SPEAK", question: entry.reply, questionZh: entry.replyZh }, { portrait: '🎭', tag: 'IN CHARACTER' });
+
     if(isLast){
+      mainInputRow.style.display = 'none';
       const row = document.createElement('div');
       row.className = 'next-btn-row';
       row.innerHTML = `<button class="next-btn" id="nextBtn">🎉 完成這一關 →</button>`;
@@ -1325,8 +1332,10 @@ async function submitRoleplayAnswer(text){
       }, { once:true });
     } else {
       awardXp(10, null);
-      // 直接順著往下聊，不用額外按「繼續」——像真人對話一樣自然接下去
-      presentRoleplayQuestion({ en: entry.reply, zh: '' });
+      currentRoleplayQuestion = { en: entry.reply, zh: entry.replyZh };
+      mainInputRow.style.display = 'flex';
+      answerInput.value = '';
+      answerInput.focus();
     }
   }catch(err){
     console.error('submitRoleplayAnswer failed:', err);
